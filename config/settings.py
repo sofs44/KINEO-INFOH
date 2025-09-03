@@ -16,11 +16,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
+    'app',  # sua aplicação principal
 ]
 
+# Indica que o modelo de usuário customizado será usado
+AUTH_USER_MODEL = 'app.Usuario'
 
-# o template usado
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -84,15 +85,16 @@ LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATIC_ROOT = os.path.join(STATIC_URL, "static")
+# Onde os arquivos coletados via collectstatic ficarão
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+# Onde ficam os arquivos estáticos dentro do projeto
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "app/static/"),
+    os.path.join(BASE_DIR, "app/static"),
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -9,29 +8,30 @@ from django.utils import timezone
 
 
 class UsuarioManager(BaseUserManager):
-    def create_user(self, nome, email, password=None, **extra_fields):
+    def create_user(self, nome, password=None, email=None, **extra_fields):
         if not nome:
-            raise ValueError("Usuários devem ter um nome de usuário")
-        if not email:
-            raise ValueError("Usuários devem ter um email")
-        email = self.normalize_email(email)
-        user = self.model(nome=nome, email=email, **extra_fields)
+            raise ValueError("O usuário deve ter um nome de usuário")
+        user = self.model(
+            nome=nome,
+            email=self.normalize_email(email) if email else None,
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, nome, email, password=None, **extra_fields):
+    def create_superuser(self, nome, password=None, email=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         if not password:
             raise ValueError("Superusers precisam de senha")
-        return self.create_user(nome, email, password, **extra_fields)
+        return self.create_user(nome, password=password, email=email, **extra_fields)
 
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id_usuario = models.AutoField(primary_key=True)
-    nome = models.CharField(max_length=150, unique=True)  # <- corrigido aqui
-    email = models.EmailField(unique=True)
+    nome = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=False, null=True, blank=True)  # Agora opcional
     idade = models.DateField(null=True, blank=True)
 
     # campos administrativos
@@ -39,6 +39,16 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
+    USERNAME_FIELD = "nome"  # login será feito pelo nome
+    REQUIRED_FIELDS = []  # Nenhum campo extra além do nome e senha
+
+    objects = UsuarioManager()
+
+    class Meta:
+        db_table = "usuarios"
+
+    def __str__(self):
+        return self.nome
 
 
 class Preferencia(models.Model):
@@ -110,7 +120,7 @@ class Grupo(models.Model):
         db_table = "grupos"
 
     def __str__(self):
-        return f"{self.nome}"
+        return self.nome
 
 
 class GrupoAdmin(models.Model):
