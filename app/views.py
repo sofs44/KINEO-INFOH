@@ -114,7 +114,7 @@ def home(request):
     if request.user.is_authenticated:
         context["preferencias"] = request.user.preferencias.all()
         context["grupos"] = request.user.grupos.all()
-    return render(request, "kineo/home.html", context)
+    return render(request, "home.html", context)
 
 
 @login_required
