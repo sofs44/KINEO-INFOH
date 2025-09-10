@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  {% load static %}
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking</title>
+  <link rel="stylesheet" href="{% static 'css/ranking.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/ranking.css' %}">
+
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="nav-left">
+      <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
+      <button class="icon-btn">
+        🔍
+      </button>
+    </div>
+    <h1 class="nav-title">Ranking</h1>
+    <div class="nav-right">
+      <button class="icon-btn">🔔</button>
+      <button class="icon-btn">💬</button>
+      <button class="icon-btn">🌙</button>
+      <img src="{% static 'img/user.png' %}" alt="Usuário" class="user-avatar">
+    </div>
+  </header>
+
+  <!-- Ranking list -->
+  <main class="ranking-container">
+    <div class="ranking-item top1">
+      <span class="medal gold">🥇</span>
+      <img src="{% static 'img/user.png' %}" class="avatar" alt="User">
+      <span class="username">Nome do usuário</span>
+      <span class="points">122 Pontos</span>
+    </div>
+
+    <div class="ranking-item top2">
+      <span class="medal silver">🥈</span>
+      <img src="{% static 'img/user.png' %}" class="avatar" alt="User">
+      <span class="username">Nome do usuário</span>
+      <span class="points">120 Pontos</span>
+    </div>
+
+    <div class="ranking-item top3">
+      <span class="medal bronze">🥉</span>
+      <img src="{% static 'img/user.png' %}" class="avatar" alt="User">
+      <span class="username">Nome do usuário</span>
+      <span class="points">119 Pontos</span>
+    </div>
+
+    <div class="ranking-item">
+      <span class="medal">4</span>
+      <img src="{% static 'img/user.png' %}" class="avatar" alt="User">
+      <span class="username">Nome do usuário</span>
+      <span class="points">110 Pontos</span>
+    </div>
+
+    <div class="ranking-item">
+      <span class="medal">5</span>
+      <img src="{% static 'img/user.png' %}" class="avatar" alt="User">
+      <span class="username">Nome do usuário</span>
+      <span class="points">107 Pontos</span>
+    </div>
+  </main>
+</body>
+</html>

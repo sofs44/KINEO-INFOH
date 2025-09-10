@@ -160,13 +160,13 @@ def buscar_parceiros(request):
             parceiros = parceiros.filter(localizacao__icontains=localizacao)
         if esporte:
             parceiros = parceiros.filter(preferencia__esportes__icontains=esporte)
-    return render(request, "kineo/buscar_parceiros.html", {"form": form, "parceiros": parceiros})
+    return render(request, "buscar_parceiros.html", {"form": form, "parceiros": parceiros})
 
 
 @login_required
 def visualizar_ranking(request):
     rankings = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")
-    return render(request, "kineo/ranking.html", {"rankings": rankings})
+    return render(request, "ranking.html", {"rankings": rankings})
 
 
 @login_required
@@ -183,7 +183,7 @@ def enviar_mensagem(request, destinatario_id):
             return redirect("kineo:conversa", usuario_id=destinatario.id_usuario)
     else:
         form = MensagemForm(initial={"destinatario_id": destinatario_id})
-    return render(request, "kineo/enviar_mensagem.html", {"form": form, "destinatario": destinatario})
+    return render(request, "enviar_mensagem.html", {"form": form, "destinatario": destinatario})
 
 
 @login_required
@@ -193,7 +193,7 @@ def conversa(request, usuario_id):
         Q(id_remetente=request.user, id_destinatario=contato) | Q(id_remetente=contato, id_destinatario=request.user)
     ).order_by("hora")
     form = MensagemForm(initial={"destinatario_id": contato.id_usuario})
-    return render(request, "kineo/conversa.html", {"contato": contato, "mensagens": mensagens, "form": form})
+    return render(request, "conversa.html", {"contato": contato, "mensagens": mensagens, "form": form})
 
 
 # ======== Grupos e desafios ========
@@ -208,7 +208,7 @@ def criar_grupo(request):
             return redirect("kineo:ver_grupo", grupo_id=grupo.id_grupo)
     else:
         form = GrupoForm()
-    return render(request, "kineo/criar_grupo.html", {"form": form})
+    return render(request, "criar_grupo.html", {"form": form})
 
 
 def listar_grupos(request):
@@ -216,14 +216,14 @@ def listar_grupos(request):
     q = request.GET.get("q")
     if q:
         qs = qs.filter(Q(nome__icontains=q) | Q(localizacao__icontains=q) | Q(descricao__icontains=q))
-    return render(request, "kineo/listar_grupos.html", {"grupos": qs})
+    return render(request, "listar_grupos.html", {"grupos": qs})
 
 
 def ver_grupo(request, grupo_id):
     grupo = get_object_or_404(Grupo, id_grupo=grupo_id)
     is_admin = request.user.is_authenticated and GrupoAdmin.objects.filter(grupo=grupo, usuario=request.user).exists()
     desafios = grupo.desafios.all()
-    return render(request, "kineo/ver_grupo.html", {"grupo": grupo, "is_admin": is_admin, "desafios": desafios})
+    return render(request, "ver_grupo.html", {"grupo": grupo, "is_admin": is_admin, "desafios": desafios})
 
 
 @login_required
@@ -238,7 +238,7 @@ def cadastrar_desafio(request):
         form = DesafioForm()
         # restringir escolhas para grupos em que o usuário é admin
         form.fields["id_grupo"].queryset = Grupo.objects.filter(admins__usuario=request.user)
-    return render(request, "kineo/cadastrar_desafio.html", {"form": form})
+    return render(request, "cadastrar_desafio.html", {"form": form})
 
 
 @login_required

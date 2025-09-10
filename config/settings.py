@@ -87,7 +87,7 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Onde os arquivos coletados via collectstatic ficarão
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
