@@ -23,12 +23,13 @@
 
                 </span>
 
-                <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
+                <a href="{% url 'ranking' %}">
+                    <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="rank">
                         <path d="M48.75 54.1666V27.0833M32.5 54.1666V10.8333M16.25 54.1666V37.9166" stroke="#1E1E1E"
                             stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </span>
+                    </svg></span>
+                </a>
 
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="sino">
@@ -38,7 +39,7 @@
                     </svg>
                 </span>
 
-                <a href="chat.html">
+                <a href="{% url 'chat' %}">
                     <span class="icon"><svg width="30" height="30" viewBox="0 0 60 60" fill="none"
                             xmlns="http://www.w3.org/2000/svg" alt="chat">
                             <path
@@ -54,6 +55,10 @@
                         <rect x="24" y="12" width="24" height="24" rx="12" fill="white" />
                     </svg>
 
+                </span>
+
+                <span>
+                    <a href="{% url 'login' %}">Login</a>
                 </span>
 
                 <span class="icon"><img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"

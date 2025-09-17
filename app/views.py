@@ -63,7 +63,7 @@ class DesafioForm(forms.ModelForm):
 
 
 # ======== Views de autenticação ========
-def register(request):
+def registrar_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -79,10 +79,10 @@ def register(request):
                     user.idade = idade
                     user.save()
                 auth_login(request, user)
-                return redirect("kineo:home")
+                return redirect("home")
     else:
         form = RegisterForm()
-    return render(request, "kineo/register.html", {"form": form})
+    return render(request, "registrar.html", {"form": form})
 
 
 def login_view(request):
@@ -94,17 +94,17 @@ def login_view(request):
             user = authenticate(request, email=email, password=senha)
             if user is not None:
                 auth_login(request, user)
-                return redirect("kineo:home")
+                return redirect("home")
             else:
                 form.add_error(None, "Credenciais inválidas")
     else:
         form = LoginForm()
-    return render(request, "kineo/login.html", {"form": form})
+    return render(request, "login.html", {"form": form})
 
 
 def logout_view(request):
     auth_logout(request)
-    return redirect("kineo:home")
+    return redirect("home")
 
 
 # ======== Views principais ========
@@ -129,10 +129,10 @@ def editar_preferencia(request, pk=None):
             pref = form.save(commit=False)
             pref.usuario = request.user
             pref.save()
-            return redirect("kineo:home")
+            return redirect("home")
     else:
         form = PreferenciaForm(instance=pref)
-    return render(request, "kineo/editar_preferencia.html", {"form": form})
+    return render(request, "editar_preferencia.html", {"form": form})
 
 
 @login_required
@@ -140,8 +140,8 @@ def deletar_preferencia(request, pk):
     pref = get_object_or_404(Preferencia, pk=pk, usuario=request.user)
     if request.method == "POST":
         pref.delete()
-        return redirect("kineo:home")
-    return render(request, "kineo/confirm_delete.html", {"obj": pref})
+        return redirect("home")
+    return render(request, "confirm_delete.html", {"obj": pref})
 
 
 @login_required
@@ -160,13 +160,16 @@ def buscar_parceiros(request):
             parceiros = parceiros.filter(localizacao__icontains=localizacao)
         if esporte:
             parceiros = parceiros.filter(preferencia__esportes__icontains=esporte)
-    return render(request, "kineo/buscar_parceiros.html", {"form": form, "parceiros": parceiros})
+    return render(request, "buscar_parceiros.html", {"form": form, "parceiros": parceiros})
 
 
 @login_required
 def visualizar_ranking(request):
-    rankings = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")
-    return render(request, "kineo/ranking.html", {"rankings": rankings})
+    rankings = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:10]
+    return render(request, "ranking.html", {"rankings": rankings})
+
+def chat_view(request):
+    return render(request, "chat.html")
 
 
 @login_required
@@ -180,10 +183,10 @@ def enviar_mensagem(request, destinatario_id):
                 id_destinatario=destinatario,
                 mensagem=form.cleaned_data["mensagem"],
             )
-            return redirect("kineo:conversa", usuario_id=destinatario.id_usuario)
+            return redirect("conversa", usuario_id=destinatario.id_usuario)
     else:
         form = MensagemForm(initial={"destinatario_id": destinatario_id})
-    return render(request, "kineo/enviar_mensagem.html", {"form": form, "destinatario": destinatario})
+    return render(request, "enviar_mensagem.html", {"form": form, "destinatario": destinatario})
 
 
 @login_required
@@ -193,7 +196,7 @@ def conversa(request, usuario_id):
         Q(id_remetente=request.user, id_destinatario=contato) | Q(id_remetente=contato, id_destinatario=request.user)
     ).order_by("hora")
     form = MensagemForm(initial={"destinatario_id": contato.id_usuario})
-    return render(request, "kineo/conversa.html", {"contato": contato, "mensagens": mensagens, "form": form})
+    return render(request, "conversa.html", {"contato": contato, "mensagens": mensagens, "form": form})
 
 
 # ======== Grupos e desafios ========
@@ -205,10 +208,10 @@ def criar_grupo(request):
             grupo = form.save()
             grupo.membros.add(request.user)
             GrupoAdmin.objects.create(grupo=grupo, usuario=request.user)
-            return redirect("kineo:ver_grupo", grupo_id=grupo.id_grupo)
+            return redirect("ver_grupo", grupo_id=grupo.id_grupo)
     else:
         form = GrupoForm()
-    return render(request, "kineo/criar_grupo.html", {"form": form})
+    return render(request, "criar_grupo.html", {"form": form})
 
 
 def listar_grupos(request):
@@ -216,14 +219,14 @@ def listar_grupos(request):
     q = request.GET.get("q")
     if q:
         qs = qs.filter(Q(nome__icontains=q) | Q(localizacao__icontains=q) | Q(descricao__icontains=q))
-    return render(request, "kineo/listar_grupos.html", {"grupos": qs})
+    return render(request, "listar_grupos.html", {"grupos": qs})
 
 
 def ver_grupo(request, grupo_id):
     grupo = get_object_or_404(Grupo, id_grupo=grupo_id)
     is_admin = request.user.is_authenticated and GrupoAdmin.objects.filter(grupo=grupo, usuario=request.user).exists()
     desafios = grupo.desafios.all()
-    return render(request, "kineo/ver_grupo.html", {"grupo": grupo, "is_admin": is_admin, "desafios": desafios})
+    return render(request, "ver_grupo.html", {"grupo": grupo, "is_admin": is_admin, "desafios": desafios})
 
 
 @login_required
@@ -233,12 +236,12 @@ def cadastrar_desafio(request):
         form = DesafioForm(request.POST)
         if form.is_valid():
             desafio = form.save()
-            return redirect("kineo:ver_grupo", grupo_id=desafio.id_grupo.id_grupo)
+            return redirect("ver_grupo", grupo_id=desafio.id_grupo.id_grupo)
     else:
         form = DesafioForm()
         # restringir escolhas para grupos em que o usuário é admin
         form.fields["id_grupo"].queryset = Grupo.objects.filter(admins__usuario=request.user)
-    return render(request, "kineo/cadastrar_desafio.html", {"form": form})
+    return render(request, "cadastrar_desafio.html", {"form": form})
 
 
 @login_required
@@ -247,4 +250,4 @@ def marcar_conclusao(request, desafio_id):
     if Conclusao.objects.filter(id_desafio=desafio, id_usuario=request.user).exists():
         return HttpResponse("Você já marcou este desafio como concluído")
     Conclusao.objects.create(id_desafio=desafio, id_usuario=request.user, data_conclusao=timezone.now().date())
-    return redirect("kineo:ver_grupo", grupo_id=desafio.id_grupo.id_grupo)
+    return redirect("ver_grupo", grupo_id=desafio.id_grupo.id_grupo)

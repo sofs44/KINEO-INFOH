@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from app import views
 
 app_name = "kineo"
@@ -9,9 +9,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Rotas do seu app
-    path("", views.home, name="home"),
-    path("register/", views.register, name="register"),
+    path("", views.home, name="home"), 
+    path("registrar/", views.registrar_view, name="registrar"),
     path("login/", views.login_view, name="login"),
+    path("chat/", views.chat_view, name="chat"),
     path("logout/", views.logout_view, name="logout"),
     path("preferencia/editar/<int:pk>/", views.editar_preferencia, name="editar_preferencia"),
     path("preferencia/novo/", views.editar_preferencia, name="nova_preferencia"),

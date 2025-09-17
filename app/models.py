@@ -31,7 +31,7 @@ class UsuarioManager(BaseUserManager):
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id_usuario = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=False, null=True, blank=True)  # Agora opcional
+    email = models.EmailField(unique=False, null=True, blank=True, default='')
     idade = models.DateField(null=True, blank=True)
 
     # campos administrativos

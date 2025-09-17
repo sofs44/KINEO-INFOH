@@ -187,3 +187,13 @@ footer {
   margin-top: 5px;
   font-size: 24px;
 }
+
+/* sofia */
+
+.icon-link {
+  display: inline-block;
+  cursor: pointer;
+}
+.icon-link svg {
+  pointer-events: none; /* evita conflitos dentro do svg */
+}
