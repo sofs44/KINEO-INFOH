@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../static/css/login.css" />
+
+</head>
+<body>
+    <div class="conteiner-login">
+        <h1>Login</h1>
+        <input type="text" placeholder="Nome" class="name">
+        <input type="password" placeholder="Senha" class="password">     
+        <button class="login">Entrar</button>
+        <a href="{% url 'registrar' %}">Não tem uma conta ? Cadastre-se</a>
+        <a href="{% url 'home' %}">Voltar</a>
+    </div>
+</body>
+</html>
