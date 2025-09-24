@@ -13,7 +13,8 @@
         <input type="text" placeholder="Nome" class="name">
         <input type="password" placeholder="Senha" class="password">     
         <button class="login">Entrar</button>
-        <a href="Registrar.html">Não tem uma conta ? Cadastre-se</a>
+        <a href="{% url 'registrar' %}">Não tem uma conta ? Cadastre-se</a>
+        <a href="{% url 'home' %}">Voltar</a>
     </div>
 </body>
 </html>

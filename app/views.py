@@ -162,11 +162,12 @@ def buscar_parceiros(request):
             parceiros = parceiros.filter(preferencia__esportes__icontains=esporte)
     return render(request, "buscar_parceiros.html", {"form": form, "parceiros": parceiros})
 
-
-@login_required
 def visualizar_ranking(request):
-    rankings = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:10]
-    return render(request, "ranking.html", {"rankings": rankings})
+    ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:50]
+    context = {
+        "ranking_list": ranking_list
+    }
+    return render(request, "ranking.html", context)
 
 def chat_view(request):
     return render(request, "chat.html")

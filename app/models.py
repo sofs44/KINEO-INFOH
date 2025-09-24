@@ -31,16 +31,18 @@ class UsuarioManager(BaseUserManager):
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id_usuario = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=False, null=True, blank=True, default='')
+    email = models.EmailField(unique=True, null=True, blank=True) # Recomendo unique=True para o email
     idade = models.DateField(null=True, blank=True)
+    
+    # NOVO CAMPO: Foto de perfil do usuário
+    foto_perfil = models.ImageField(upload_to='profile_pics/', null=True, blank=True, default='profile_pics/default-avatar.png')
 
-    # campos administrativos
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    USERNAME_FIELD = "nome"  # login será feito pelo nome
-    REQUIRED_FIELDS = []  # Nenhum campo extra além do nome e senha
+    USERNAME_FIELD = "nome"
+    REQUIRED_FIELDS = ['email'] # Email agora é requerido para criar superuser
 
     objects = UsuarioManager()
 

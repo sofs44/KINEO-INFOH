@@ -48,13 +48,10 @@
                     </span>
                 </a>
 
-                <span class="icon"><svg width="30" height="30" viewBox="0 0 60 48" fill="none"
-                        xmlns="http://www.w3.org/2000/svg" alt="botao">
-                        <rect y="8" width="52" height="32" rx="16" fill="black" />
-                        <rect x="24" y="12" width="24" height="24" rx="12" fill="white" />
-                    </svg>
-
-                </span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
 
                 <span class="icon"><img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
                         alt="usuario" width="30" height="30"></span>
@@ -66,7 +63,7 @@
     <div class="main-content">
         <div class="msg">
           <p class="mensg">Encontre seu parceiro/comunidade, faça seu 
-            <a href="#" class="bttLogin">Login</a> para acessar o chat.
+            <a href="{% url 'login' %}" class="bttLogin">Login</a> para acessar o chat.
           </p>
         </div>
       

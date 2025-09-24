@@ -1,0 +1,122 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: #fff;
+    color: #222;
+    font-size: 20px;
+  }
+  
+  .menu {
+    display: flex;
+    justify-content: space-between;
+    padding: 50px 100px;
+    align-items: center;
+  }
+  
+  .logo {
+    height: 30px;
+  }
+  
+  .icons {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .icon {
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+}
+
+/* --- Conteúdo Principal do Ranking --- */
+.ranking-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.ranking-item:hover {
+    transform: translateY(-3px);
+}
+
+.position {
+    flex-basis: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.medal {
+    width: 45px;
+    height: auto;
+}
+
+.position-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #888;
+    background-color: #e4e6eb;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.user-info {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: 20px;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.username {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.points {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Estilo para destacar o usuário logado */
+.user-highlight {
+    border: 2px solid #007bff; /* Cor de destaque azul */
+    background-color: #e7f3ff;
+}
