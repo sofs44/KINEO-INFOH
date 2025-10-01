@@ -12,7 +12,7 @@
 <body>
     <header>
         <div class="menu">
-            <img src="logo.png" alt="Logo" class="logo" />
+            <img src="{% static 'Assets/logo.png' %}" alt="Logo" class="logo" />
             <div class="icons">
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 53 57" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="lupa">
@@ -70,7 +70,8 @@
             <button class="circ circ2">Conecte</button>
             <button class="circ circ3">Evolua</button>
         </div>
-        <div class="logo_centro">Kineo<br><small>Logo</small></div>
+        <div class="logo_centro"><img src="{% static 'Assets/logo.png' %}" alt="Logo" />
+        </div>
     </header>
 
     <section class="draw">

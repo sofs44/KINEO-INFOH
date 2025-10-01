@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 
 <head>
+    {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat — Kineo</title>
@@ -12,7 +13,7 @@
 
     <header>
         <div class="menu">
-            <img src="logo.png" alt="Logo" class="logo" />
+            <img src="{% static 'Assets/logo.png' %}" alt="Logo" class="logo" />
             <div class="icons">
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 53 57" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="lupa">
@@ -23,12 +24,13 @@
 
                 </span>
 
-                <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
+                <a href="{% url 'ranking' %}">
+                    <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="rank">
                         <path d="M48.75 54.1666V27.0833M32.5 54.1666V10.8333M16.25 54.1666V37.9166" stroke="#1E1E1E"
                             stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </span>
+                    </svg></span>
+                </a>
 
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="sino">
@@ -37,16 +39,6 @@
                             fill="#1D1B20" />
                     </svg>
                 </span>
-
-                <a href="chat.html">
-                    <span class="icon"><svg width="30" height="30" viewBox="0 0 60 60" fill="none"
-                            xmlns="http://www.w3.org/2000/svg" alt="chat">
-                            <path
-                                d="M52.5 28.7501C52.5086 32.0497 51.7377 35.3048 50.25 38.2501C48.4861 41.7794 45.7744 44.748 42.4186 46.8233C39.0629 48.8985 35.1956 49.9985 31.25 50.0001C27.9503 50.0087 24.6953 49.2377 21.75 47.7501L7.5 52.5001L12.25 38.2501C10.7623 35.3048 9.9914 32.0497 10 28.7501C10.0015 24.8045 11.1015 20.9372 13.1768 17.5814C15.2521 14.2257 18.2206 11.514 21.75 9.75007C24.6953 8.2624 27.9503 7.49147 31.25 7.50007H32.5C37.7109 7.78755 42.6326 9.98697 46.3229 13.6772C50.0131 17.3675 52.2125 22.2892 52.5 27.5001V28.7501Z"
-                                stroke="#1E1E1E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </span>
-                </a>
 
                 <label class="switch">
                     <input type="checkbox">

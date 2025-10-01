@@ -12,7 +12,8 @@
 <body>
     <header>
         <div class="menu">
-            <img src="logo.png" alt="Logo" class="logo" />
+            <img src="{% static 'Assets/logo.png' %}" alt="Logo" class="logo" />
+
             <div class="icons">
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 53 57" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="lupa">
@@ -22,14 +23,6 @@
                     </svg>
 
                 </span>
-
-                <a href="{% url 'ranking' %}">
-                    <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
-                            xmlns="http://www.w3.org/2000/svg" alt="rank">
-                            <path d="M48.75 54.1666V27.0833M32.5 54.1666V10.8333M16.25 54.1666V37.9166" stroke="#1E1E1E"
-                                stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg></span>
-                </a>
 
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="sino">
@@ -56,11 +49,6 @@
 
 
                 </span>
-
-                <span>
-                    <a href="{% url 'login' %}">Login</a>
-                </span>
-
                 <span class="icon"><img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
                         alt="usuario" width="30" height="30"></span>
             </div>

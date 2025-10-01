@@ -14,8 +14,11 @@ body {
 }
 
 .logo {
-  height: 30px;
+  height: 60px !important; /* aumenta ou diminui como quiser */
+  width: auto !important;  /* mantém a proporção */
+  display: block;  
 }
+
 
 .icons {
   display: flex;

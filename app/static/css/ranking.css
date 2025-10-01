@@ -14,8 +14,11 @@ body {
   }
   
   .logo {
-    height: 30px;
+    height: 60px !important; /* aumenta ou diminui como quiser */
+    width: auto !important;  /* mantém a proporção */
+    display: block;  
   }
+  
   
   .icons {
     display: flex;
@@ -117,8 +120,8 @@ body {
 
 /* Estilo para destacar o usuário logado */
 .user-highlight {
-    border: 2px solid #007bff; /* Cor de destaque azul */
-    background-color: #e7f3ff;
+    border: 2px solid #af5d00; /* Cor de destaque azul */
+    background-color: #d87300;
 }
 
 .circle {
