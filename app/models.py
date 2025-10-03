@@ -7,10 +7,14 @@ from django.contrib.auth.models import (
 from django.utils import timezone
 
 
+# =======================
+# MANAGER PERSONALIZADO
+# =======================
 class UsuarioManager(BaseUserManager):
     def create_user(self, nome, password=None, email=None, **extra_fields):
         if not nome:
             raise ValueError("O usuário deve ter um nome de usuário")
+
         user = self.model(
             nome=nome,
             email=self.normalize_email(email) if email else None,
@@ -23,26 +27,41 @@ class UsuarioManager(BaseUserManager):
     def create_superuser(self, nome, password=None, email=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser precisa ter is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser precisa ter is_superuser=True.")
         if not password:
-            raise ValueError("Superusers precisam de senha")
+            raise ValueError("Superusers precisam de senha.")
+
         return self.create_user(nome, password=password, email=email, **extra_fields)
 
 
+# =======================
+# MODEL USUÁRIO
+# =======================
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id_usuario = models.AutoField(primary_key=True)
-    nome = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True, null=True, blank=True) # Recomendo unique=True para o email
+    nome = models.CharField(max_length=150, unique=True)  # 👈 será o username
+    email = models.EmailField(unique=True, null=True, blank=True)
     idade = models.DateField(null=True, blank=True)
-    
-    # NOVO CAMPO: Foto de perfil do usuário
-    foto_perfil = models.ImageField(upload_to='profile_pics/', null=True, blank=True, default='profile_pics/default-avatar.png')
+
+    # Foto de perfil opcional
+    foto_perfil = models.ImageField(
+        upload_to='profile_pics/',
+        null=True,
+        blank=True,
+        default='profile_pics/default-avatar.png'
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    USERNAME_FIELD = "nome"
-    REQUIRED_FIELDS = ['email'] # Email agora é requerido para criar superuser
+    # ⚙️ Configurações de autenticação
+    USERNAME_FIELD = "nome"           # campo usado para login
+    REQUIRED_FIELDS = ["email"]       # campo obrigatório ao criar superuser
 
     objects = UsuarioManager()
 
@@ -53,6 +72,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         return self.nome
 
 
+# =======================
+# PREFERÊNCIA
+# =======================
 class Preferencia(models.Model):
     id_preferencia = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="preferencias")
@@ -69,6 +91,9 @@ class Preferencia(models.Model):
         return f"Pref {self.id_preferencia} - {self.usuario.nome}"
 
 
+# =======================
+# PARCEIRO
+# =======================
 class Parceiro(models.Model):
     id_parceiros = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="parceiros")
@@ -82,6 +107,9 @@ class Parceiro(models.Model):
         return f"Parceiro {self.id_parceiros} - {self.usuario.nome}"
 
 
+# =======================
+# RANKING
+# =======================
 class Ranking(models.Model):
     id_ranking = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="rankings")
@@ -95,6 +123,9 @@ class Ranking(models.Model):
         return f"{self.usuario.nome} - {self.pontuacao_total}"
 
 
+# =======================
+# MENSAGEM
+# =======================
 class Mensagem(models.Model):
     id_mensagem = models.AutoField(primary_key=True)
     id_remetente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="mensagens_enviadas")
@@ -110,6 +141,9 @@ class Mensagem(models.Model):
         return f"De {self.id_remetente.nome} para {self.id_destinatario.nome} - {self.hora}"
 
 
+# =======================
+# GRUPO
+# =======================
 class Grupo(models.Model):
     id_grupo = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=200)
@@ -125,6 +159,9 @@ class Grupo(models.Model):
         return self.nome
 
 
+# =======================
+# ADMIN DE GRUPO
+# =======================
 class GrupoAdmin(models.Model):
     id = models.AutoField(primary_key=True)
     grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name="admins")
@@ -138,6 +175,9 @@ class GrupoAdmin(models.Model):
         return f"Admin {self.usuario.nome} de {self.grupo.nome}"
 
 
+# =======================
+# DESAFIO
+# =======================
 class Desafio(models.Model):
     id_desafio = models.AutoField(primary_key=True)
     id_grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name="desafios")
@@ -153,6 +193,9 @@ class Desafio(models.Model):
         return f"{self.titulo} ({self.id_grupo.nome})"
 
 
+# =======================
+# CONCLUSÃO
+# =======================
 class Conclusao(models.Model):
     id_conclusao = models.AutoField(primary_key=True)
     id_desafio = models.ForeignKey(Desafio, on_delete=models.CASCADE, related_name="conclusoes")

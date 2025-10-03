@@ -20,16 +20,17 @@ from django.utils import timezone
 
 
 # ======== Forms simples usados pelas views ========
+
 class RegisterForm(forms.Form):
-    nome = forms.CharField(max_length=150)
-    email = forms.EmailField()
-    senha = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(max_length=150, label="Nome de usuário")
+    senha = forms.CharField(widget=forms.PasswordInput, label="Senha")
+    senha2 = forms.CharField(widget=forms.PasswordInput, label="Confirmar senha", required=True)
     idade = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField()
-    senha = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(label="Nome de usuário")
+    senha = forms.CharField(widget=forms.PasswordInput, label="Senha")
 
 
 class PreferenciaForm(forms.ModelForm):
@@ -59,22 +60,33 @@ class DesafioForm(forms.ModelForm):
     class Meta:
         model = Desafio
         fields = ["id_grupo", "titulo", "descricao", "data_inicio", "data_fim"]
-        widgets = {"data_inicio": forms.DateInput(attrs={"type": "date"}), "data_fim": forms.DateInput(attrs={"type": "date"})}
+        widgets = {
+            "data_inicio": forms.DateInput(attrs={"type": "date"}),
+            "data_fim": forms.DateInput(attrs={"type": "date"})
+        }
 
 
 # ======== Views de autenticação ========
+
 def registrar_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            nome = form.cleaned_data["nome"]
-            email = form.cleaned_data["email"]
+            username = form.cleaned_data["username"]
             senha = form.cleaned_data["senha"]
+            senha2 = form.cleaned_data["senha2"]
             idade = form.cleaned_data.get("idade")
-            if Usuario.objects.filter(email=email).exists():
-                form.add_error("email", "Email já cadastrado")
+
+            # Verifica se as senhas coincidem
+            if senha != senha2:
+                form.add_error("senha2", "As senhas não coincidem.")
+                return render(request, "registrar.html", {"form": form})
+
+            # Verifica se usuário já existe
+            if Usuario.objects.filter(username=username).exists():
+                form.add_error("username", "Este nome de usuário já está em uso.")
             else:
-                user = Usuario.objects.create_user(email=email, nome=nome, password=senha)
+                user = Usuario.objects.create_user(username=username, password=senha)
                 if idade:
                     user.idade = idade
                     user.save()
@@ -89,14 +101,14 @@ def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data["email"]
+            username = form.cleaned_data["username"]
             senha = form.cleaned_data["senha"]
-            user = authenticate(request, email=email, password=senha)
+            user = authenticate(request, username=username, password=senha)
             if user is not None:
                 auth_login(request, user)
                 return redirect("home")
             else:
-                form.add_error(None, "Credenciais inválidas")
+                form.add_error(None, "Nome de usuário ou senha inválidos.")
     else:
         form = LoginForm()
     return render(request, "login.html", {"form": form})
@@ -108,8 +120,8 @@ def logout_view(request):
 
 
 # ======== Views principais ========
+
 def home(request):
-    # página inicial simples: se estiver logado, mostrar preferências e grupos.
     context = {}
     if request.user.is_authenticated:
         context["preferencias"] = request.user.preferencias.all()
@@ -154,7 +166,7 @@ def buscar_parceiros(request):
         esporte = form.cleaned_data.get("esporte")
         if termo:
             parceiros = parceiros.filter(
-                Q(usuario__nome__icontains=termo) | Q(preferencia__esportes__icontains=termo)
+                Q(usuario__username__icontains=termo) | Q(preferencia__esportes__icontains=termo)
             )
         if localizacao:
             parceiros = parceiros.filter(localizacao__icontains=localizacao)
@@ -162,12 +174,11 @@ def buscar_parceiros(request):
             parceiros = parceiros.filter(preferencia__esportes__icontains=esporte)
     return render(request, "buscar_parceiros.html", {"form": form, "parceiros": parceiros})
 
+
 def visualizar_ranking(request):
     ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:50]
-    context = {
-        "ranking_list": ranking_list
-    }
-    return render(request, "ranking.html", context)
+    return render(request, "ranking.html", {"ranking_list": ranking_list})
+
 
 def chat_view(request):
     return render(request, "chat.html")
@@ -179,7 +190,7 @@ def enviar_mensagem(request, destinatario_id):
     if request.method == "POST":
         form = MensagemForm(request.POST)
         if form.is_valid():
-            mensagem = Mensagem.objects.create(
+            Mensagem.objects.create(
                 id_remetente=request.user,
                 id_destinatario=destinatario,
                 mensagem=form.cleaned_data["mensagem"],
@@ -201,6 +212,7 @@ def conversa(request, usuario_id):
 
 
 # ======== Grupos e desafios ========
+
 @login_required
 def criar_grupo(request):
     if request.method == "POST":
@@ -232,7 +244,6 @@ def ver_grupo(request, grupo_id):
 
 @login_required
 def cadastrar_desafio(request):
-    # apenas admins de grupo podem criar desafios
     if request.method == "POST":
         form = DesafioForm(request.POST)
         if form.is_valid():
@@ -240,7 +251,6 @@ def cadastrar_desafio(request):
             return redirect("ver_grupo", grupo_id=desafio.id_grupo.id_grupo)
     else:
         form = DesafioForm()
-        # restringir escolhas para grupos em que o usuário é admin
         form.fields["id_grupo"].queryset = Grupo.objects.filter(admins__usuario=request.user)
     return render(request, "cadastrar_desafio.html", {"form": form})
 
