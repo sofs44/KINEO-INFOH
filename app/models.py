@@ -124,7 +124,7 @@ class Ranking(models.Model):
 
 
 # =======================
-# MENSAGEM
+# MENSAGEM (INDIVIDUAL)
 # =======================
 class Mensagem(models.Model):
     id_mensagem = models.AutoField(primary_key=True)
@@ -157,6 +157,24 @@ class Grupo(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+# =======================
+# MENSAGEM (GRUPO) - NOVO MODELO
+# =======================
+class MensagemGrupo(models.Model):
+    id_mensagem = models.AutoField(primary_key=True)
+    id_grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name="mensagens")
+    id_remetente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="mensagens_grupo_enviadas")
+    mensagem = models.TextField()
+    hora = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "mensagens_grupo"
+        ordering = ["hora"]
+
+    def __str__(self):
+        return f"Em {self.id_grupo.nome} de {self.id_remetente.nome} - {self.hora}"
 
 
 # =======================
@@ -208,3 +226,4 @@ class Conclusao(models.Model):
 
     def __str__(self):
         return f"{self.id_usuario.nome} concluiu {self.id_desafio.titulo}"
+

@@ -12,6 +12,7 @@ urlpatterns = [
 
     # Rotas do seu app
     path("", views.home, name="home"), 
+    path('sobre/', views.sobre, name='sobre'),
     path("registrar/", views.registrar_view, name="registrar"),
     path("login/", views.login_view, name="login"),
     path("chat/", views.chat_view, name="chat"),
@@ -28,6 +29,9 @@ urlpatterns = [
     path("grupo/criar/", views.criar_grupo, name="criar_grupo"),
     path("desafio/cadastrar/", views.cadastrar_desafio, name="cadastrar_desafio"),
     path("desafio/mark/<int:desafio_id>/", views.marcar_conclusao, name="marcar_conclusao"),
+    path('chat/', views.chat_view, name='chat_view'),
+    path('chat/u/<int:usuario_id>/', views.conversa, name='conversa'), # Conversa individual
+    path('chat/g/<int:grupo_id>/', views.conversa_grupo, name='conversa_grupo'), # Conversa em grupo
 ]
 
 if settings.DEBUG:

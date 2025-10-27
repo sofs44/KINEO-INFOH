@@ -1,20 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/login.css" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
     <title>Registrar</title>
-
 </head>
 <body>
     <div class="conteiner-login">
         <h1>Registrar</h1>
-        <input type="text" placeholder="Nome" class="name">
-        <input type="password" placeholder="Senha" class="password">     
-        <button class="login">Entrar</button>
-        <a href="{% url 'login' %}">Já tem uma conta ?</a>
+
+        <form method="POST" action="{% url 'registrar' %}">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="erro">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <input type="text" name="nome" placeholder="Nome" class="name" required>
+            <input type="email" name="email" placeholder="Email" class="name" required>
+            <input type="password" name="senha" placeholder="Senha" class="password" required>
+            <input type="password" name="senha2" placeholder="Confirmar senha" class="password" required>
+            <input type="date" name="idade" class="name" placeholder="Data de nascimento (opcional)">
+
+            <button type="submit" class="login">Registrar</button>
+        </form>
+
+        <a href="{% url 'login' %}">Já tem uma conta?</a>
     </div>
-    
 </body>
 </html>
