@@ -55,12 +55,32 @@
                     <span class="slider round"></span>
                 </label>
 
-                <span>
-                    <a href="{% url 'login' %}">Login</a>
-                </span>
 
-                <span class="icon"><img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
-                        alt="usuario" width="30" height="30"></span>
+            {% if user.is_authenticated %}
+                <div class="user-menu">
+                    <img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
+                         alt="usuario" width="35" height="35" class="user-icon" id="user-icon">
+                
+                    <div class="dropdown" id="user-dropdown">
+                        <a href="{% url 'perfil' %}"><img src="https://img.icons8.com/?size=100&id=82751&format=png&color=000000" alt="usuário" width="25" height="25" > Perfil</a>
+                        <a href="#" id="logout-btn"><img src="https://img.icons8.com/?size=100&id=82792&format=png&color=000000" alt="logout" width="25" height="25"> Sair</a>
+                    </div>
+                </div>
+                
+                <!-- Modal de confirmação de logout -->
+                <div id="logout-modal" class="modal">
+                    <div class="modal-content">
+                        <p>Tem certeza que deseja sair?</p>
+                        <div class="modal-buttons">
+                            <button id="confirm-logout">Sim</button>
+                            <button id="cancel-logout">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-link">Entrar</a>
+            {% endif %}
+                
 
             </div>
         </div>
@@ -156,6 +176,44 @@
             <strong><a href="{% url 'sobre' %}">Sobre Nós</a></strong>
         </div>
     </footer>
+    <script>
+        // Mostra/oculta o menu do usuário
+        const userIcon = document.getElementById('user-icon');
+        const dropdown = document.getElementById('user-dropdown');
+        const logoutBtn = document.getElementById('logout-btn');
+        const modal = document.getElementById('logout-modal');
+        const confirmLogout = document.getElementById('confirm-logout');
+        const cancelLogout = document.getElementById('cancel-logout');
+      
+        userIcon.addEventListener('click', () => {
+          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+      
+        // Fecha o menu se clicar fora
+        window.addEventListener('click', (e) => {
+          if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+          }
+        });
+      
+        // Abre o modal de confirmação
+        logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          modal.style.display = 'block';
+          dropdown.style.display = 'none';
+        });
+      
+        // Confirmar logout
+        confirmLogout.addEventListener('click', () => {
+          window.location.href = "{% url 'logout' %}";
+        });
+      
+        // Cancelar logout
+        cancelLogout.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+      </script>
+      
 </body>
 
 </html>

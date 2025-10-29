@@ -285,7 +285,7 @@ def conversa(request, usuario_id):
     # Lógica de envio de mensagem
     if request.method == "POST":
         form = MensagemForm(request.POST)
-        if form.is_valid() and form.cleaned_data.get('destinatario_id') == contato.id_usuario:
+        if form.is_valid():
             Mensagem.objects.create(
                 id_remetente=user,
                 id_destinatario=contato,
@@ -519,3 +519,7 @@ def marcar_conclusao(request, desafio_id):
 
 def sobre(request):
     return render(request, 'sobre.html')
+
+@login_required
+def perfil_view(request):
+    return render(request, 'perfil.html')

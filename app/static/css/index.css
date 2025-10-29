@@ -200,3 +200,113 @@ footer {
 .icon-link svg {
   pointer-events: none; /* evita conflitos dentro do svg */
 }
+
+/* ========== MENU DO USUÁRIO ========== */
+.user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-icon {
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 10;
+  min-width: 140px;
+}
+
+.dropdown a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #222;
+  font-size: 16px;
+}
+
+.dropdown a:hover {
+  background-color: #f0f0f0;
+}
+
+/* ========== MODAL DE CONFIRMAÇÃO ========== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 15% auto;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#confirm-logout {
+  background: #d87300;
+  color: white;
+}
+
+#cancel-logout {
+  background: #ccc;
+}
+
+.login-link {
+  text-decoration: none;
+  color: #d87300;
+  font-weight: bold;
+  padding: 8px 12px;
+  border: 2px solid #d87300;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.login-link:hover {
+  background-color: #d87300;
+  color: white;
+}
+
+.user-menu .dropdown a {
+  display: flex;
+  align-items: center;   /* Alinha ícone e texto verticalmente */
+  gap: 8px;              /* Espaçamento entre o ícone e o texto */
+  text-decoration: none;
+  color: #000;
+  padding: 8px 12px;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.user-menu .dropdown a:hover {
+  background-color: #f2f2f2;
+  border-radius: 6px;
+}

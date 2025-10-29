@@ -177,11 +177,11 @@
                 <div id="input-box">
                     <form method="POST">
                         {% csrf_token %}
-                        {% if form.destinatario_id %}{{ form.destinatario_id }}{% endif %}
-                        {% if form.grupo_id %}{{ form.grupo_id }}{% endif %}
+                        <input type="hidden" name="destinatario_id" value="{{ active_conversation.id }}">
                         {{ form.mensagem }}
                         <button type="submit"><i class="fas fa-paper-plane"></i></button>
                     </form>
+                    >
                 </div>
                 {% else %}
                 <!-- Mensagem Inicial (Escolha alguém para conversar) -->
