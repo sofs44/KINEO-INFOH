@@ -1,0 +1,321 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: #fff;
+  color: #222;
+  font-size: 20px;
+}
+
+.menu {
+  display: flex;
+  justify-content: space-between;
+  padding: 50px 100px;
+  align-items: center;
+}
+
+.logo {
+  height: 60px !important; /* aumenta ou diminui como quiser */
+  width: auto !important;  /* mantém a proporção */
+  display: block;  
+}
+
+
+.icons {
+  display: flex;
+  gap: 15px;
+}
+
+.icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.bolas {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+.circ {
+  background: #d87300;
+  border: none;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.circ1 {
+  animation: mover1 3s ease-in-out infinite;
+}
+.circ2 {
+  animation: mover2 4s ease-in-out infinite;
+}
+.circ3 {
+  animation: mover3 5s ease-in-out infinite;
+}
+
+@keyframes mover1 {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes mover2 {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(30px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes mover3 {
+  0% { transform: translateX(0); }
+  25% { transform: translateY(10px); }
+  50% { transform: translateX(-30px); }
+  75% { transform: translateY(-10px); }
+  100% { transform: translateX(0); }
+}
+
+
+.logo_centro {
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/*  */
+/* ====== SEÇÃO DA IMAGEM (draw) ====== */
+.draw {
+  background: #d87300;   /* mantém o fundo laranja */
+  text-align: center;    /* centraliza a imagem */
+  padding: 25px 0;       /* espaço acima/abaixo */
+}
+
+
+.draw img,
+.draw .draw-img {
+  width: 250px !important;   /* força o tamanho */
+  height: auto !important;   /* mantém a proporção */
+  display: inline-block;
+}
+
+
+/*  */
+.cards {
+  display: flex;
+  justify-content: space-around;
+  padding: 50px 20px;
+  gap: 40px;
+}
+
+.card-wrapper {
+  position: relative; /* necessário para posicionar as faixas */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: #fff;
+  box-shadow: 1px 1px 21px -3px rgba(0, 0, 0, 0.46);
+  padding: 20px;
+  width: 200px;
+  height: 200px;
+  text-align: center;
+  border-radius: 12px;
+  z-index: 1;
+}
+
+.card span {
+  font-size: 24px;
+  display: block;
+  margin-top: 10px;
+}
+
+.card ,h3{
+  text-align: center;
+  padding: 10px;
+
+}
+
+
+/* ---------- FAIXAS DECORATIVAS ---------- */
+.faixa {
+  background-color: #d87300;
+  position: absolute;
+  z-index: 0;
+  border-radius: 2px;
+}
+
+.faixa-bottom {
+  width: 225px;
+  height: 20px;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 8px;
+}
+
+.faixa-left {
+  width: 20px;
+  height: 225px;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 8px;
+}
+
+.faixa-top {
+  width: 225px;
+  height: 20px;
+  top: -20px;
+  right: 0;
+  border-radius: 8px;
+}
+
+
+footer {
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 150px 150px;
+  font-size: 20px;
+  flex-wrap: wrap;
+}
+
+.footer_itens {
+  margin: 10px;
+  text-align: center;
+}
+.foot_icons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 5px;
+  font-size: 24px;
+}
+
+/* sofia */
+
+.icon-link {
+  display: inline-block;
+  cursor: pointer;
+}
+.icon-link svg {
+  pointer-events: none; /* evita conflitos dentro do svg */
+}
+
+/* ========== MENU DO USUÁRIO ========== */
+.user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-icon {
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 10;
+  min-width: 140px;
+}
+
+.dropdown a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #222;
+  font-size: 16px;
+}
+
+.dropdown a:hover {
+  background-color: #f0f0f0;
+}
+
+/* ========== MODAL DE CONFIRMAÇÃO ========== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 15% auto;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#confirm-logout {
+  background: #d87300;
+  color: white;
+}
+
+#cancel-logout {
+  background: #ccc;
+}
+
+.login-link {
+  text-decoration: none;
+  color: #d87300;
+  font-weight: bold;
+  padding: 8px 12px;
+  border: 2px solid #d87300;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.login-link:hover {
+  background-color: #d87300;
+  color: white;
+}
+
+.user-menu .dropdown a {
+  display: flex;
+  align-items: center;   /* Alinha ícone e texto verticalmente */
+  gap: 8px;              /* Espaçamento entre o ícone e o texto */
+  text-decoration: none;
+  color: #000;
+  padding: 8px 12px;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.user-menu .dropdown a:hover {
+  background-color: #f2f2f2;
+  border-radius: 6px;
+}

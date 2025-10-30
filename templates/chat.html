@@ -1,0 +1,200 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat — Kineo</title>
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}" />
+    <!-- Ícones Font Awesome para os ícones de usuário, grupo, etc. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="menu">
+            <img src="{% static 'Assets/logo.png' %}" alt="Logo" class="logo" />
+            <div class="icons">
+                <span class="icon"><svg width="30" height="30" viewBox="0 0 53 57" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" alt="lupa">
+                        <path
+                            d="M43.2833 49.875L29.3708 34.9125C28.2667 35.8625 26.9969 36.6146 25.5615 37.1688C24.126 37.7229 22.5986 38 20.9792 38C16.9674 38 13.572 36.5057 10.7932 33.5172C8.01441 30.5286 6.625 26.8771 6.625 22.5625C6.625 18.2479 8.01441 14.5964 10.7932 11.6078C13.572 8.61927 16.9674 7.125 20.9792 7.125C24.991 7.125 28.3863 8.61927 31.1651 11.6078C33.9439 14.5964 35.3333 18.2479 35.3333 22.5625C35.3333 24.3042 35.0757 25.9469 34.5604 27.4906C34.0451 29.0344 33.3458 30.4 32.4625 31.5875L46.375 46.55L43.2833 49.875ZM20.9792 33.25C23.7396 33.25 26.0859 32.2109 28.0182 30.1328C29.9505 28.0547 30.9167 25.5312 30.9167 22.5625C30.9167 19.5938 29.9505 17.0703 28.0182 14.9922C26.0859 12.9141 23.7396 11.875 20.9792 11.875C18.2188 11.875 15.8724 12.9141 13.9401 14.9922C12.0078 17.0703 11.0417 19.5938 11.0417 22.5625C11.0417 25.5312 12.0078 28.0547 13.9401 30.1328C15.8724 32.2109 18.2188 33.25 20.9792 33.25Z"
+                            fill="#1D1B20" />
+                    </svg>
+
+                </span>
+
+                <a href="{% url 'ranking' %}">
+                    <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" alt="rank">
+                            <path d="M48.75 54.1666V27.0833M32.5 54.1666V10.8333M16.25 54.1666V37.9166" stroke="#1E1E1E"
+                                stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg></span>
+                </a>
+
+                <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" alt="sino">
+                        <path
+                            d="M10.8335 51.4584V46.0418H16.2502V27.0834C16.2502 23.3369 17.3786 20.0192 19.6356 17.1303C21.8925 14.1963 24.8266 12.2779 28.4377 11.3751V9.47925C28.4377 8.35078 28.8213 7.40286 29.5887 6.6355C30.4012 5.823 31.3717 5.41675 32.5002 5.41675C33.6286 5.41675 34.5766 5.823 35.3439 6.6355C36.1564 7.40286 36.5627 8.35078 36.5627 9.47925V11.3751C40.1738 12.2779 43.1078 14.1963 45.3647 17.1303C47.6217 20.0192 48.7502 23.3369 48.7502 27.0834V46.0418H54.1668V51.4584H10.8335ZM32.5002 59.5834C31.0106 59.5834 29.7241 59.0643 28.6408 58.0261C27.6026 56.9428 27.0835 55.6563 27.0835 54.1668H37.9168C37.9168 55.6563 37.3752 56.9428 36.2918 58.0261C35.2536 59.0643 33.9897 59.5834 32.5002 59.5834ZM21.6668 46.0418H43.3335V27.0834C43.3335 24.1042 42.2727 21.5539 40.1512 19.4324C38.0297 17.3108 35.4793 16.2501 32.5002 16.2501C29.521 16.2501 26.9707 17.3108 24.8491 19.4324C22.7276 21.5539 21.6668 24.1042 21.6668 27.0834V46.0418Z"
+                            fill="#1D1B20" />
+                    </svg>
+                </span>
+
+                <a href="{% url 'chat' %}">
+                    <span class="icon"><svg width="30" height="30" viewBox="0 0 60 60" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" alt="chat">
+                            <path
+                                d="M52.5 28.7501C52.5086 32.0497 51.7377 35.3048 50.25 38.2501C48.4861 41.7794 45.7744 44.748 42.4186 46.8233C39.0629 48.8985 35.1956 49.9985 31.25 50.0001C27.9503 50.0087 24.6953 49.2377 21.75 47.7501L7.5 52.5001L12.25 38.2501C10.7623 35.3048 9.9914 32.0497 10 28.7501C10.0015 24.8045 11.1015 20.9372 13.1768 17.5814C15.2521 14.2257 18.2206 11.514 21.75 9.75007C24.6953 8.2624 27.9503 7.49147 31.25 7.50007H32.5C37.7109 7.78755 42.6326 9.98697 46.3229 13.6772C50.0131 17.3675 52.2125 22.2892 52.5 27.5001V28.7501Z"
+                                stroke="#1E1E1E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </a>
+
+
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+
+                <span>
+                    <a href="{% url 'login' %}">Login</a>
+                </span>
+
+                <span class="icon"><img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
+                        alt="usuario" width="30" height="30"></span>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        {% if not is_authenticated %}
+        <!-- CONTEÚDO PARA USUÁRIO NÃO LOGADO -->
+        <div class="msg">
+            <p class="mensg">
+                Encontre seu parceiro/comunidade, faça seu
+                <a href="{% url 'login' %}" class="bttLogin">Login</a> para acessar o chat.
+            </p>
+        </div>
+
+        <!-- FOOTER só aparece para não logados -->
+        <footer>
+            <div class="footer_itens">
+                <strong>Kineo</strong><br>
+                © 2025 Kineo
+            </div>
+            <div class="footer_itens">
+                <strong>Redes</strong><br>
+                <div class="foot_icons">
+                    <span class="icon"><i class="fab fa-instagram"></i></span>
+                    <span class="icon"><i class="fab fa-twitter"></i></span>
+                </div>
+            </div>
+            <div class="footer_itens">
+                <strong>Contate-nos</strong><br>
+                <div class="foot_icons">
+                    <span class="icon"><i class="fas fa-phone"></i></span>
+                    <span class="icon"><i class="fas fa-envelope"></i></span>
+                </div>
+            </div>
+            <div class="footer_itens">
+                <strong>Sobre Nós</strong>
+            </div>
+        </footer>
+        {% else %}
+
+
+        <!-- CONTEÚDO PARA USUÁRIO LOGADO (LAYOUT DE DUAS COLUNAS) -->
+        <div class="chat-page-container">
+            <!-- Coluna da Esquerda: Lista de Amigos e Grupos -->
+            <aside class="chat-sidebar">
+                <!-- Barra de Busca -->
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar amigo / grupo">
+                </div>
+
+                <!-- Lista de Conversas (Amigos e Grupos) -->
+                <div class="conversations-list">
+                    {% if conversations %}
+                    {% for conv in conversations %}
+                    {% if conv.is_group %}
+                    <!-- Item de Grupo -->
+                    <a href="{% url 'conversa_grupo' grupo_id=conv.id %}"
+                        class="conversation-item {% if conv.is_active %}active{% endif %}">
+                        <div class="profile-pic group-pic">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="conversation-info">
+                            <span class="name">{{ conv.nome }}</span>
+                            <span class="last-message">Grupo: {{ conv.last_message }}</span>
+                        </div>
+                    </a>
+                    {% else %}
+                    <!-- Item de Amigo -->
+                    <a href="{% url 'conversa' usuario_id=conv.id %}"
+                        class="conversation-item {% if conv.is_active %}active{% endif %}">
+                        {% if conv.foto_perfil %}
+                        <!-- Foto de perfil do usuário -->
+                        <img src="{{ conv.foto_perfil.url }}" alt="{{ conv.nome }}" class="profile-pic">
+                        {% else %}
+                        <!-- Ícone padrão se não houver foto -->
+                        <div class="profile-pic default-pic">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                        <div class="conversation-info">
+                            <span class="name">{{ conv.nome }}</span>
+                            <span class="last-message">{{ conv.last_message }}</span>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="no-conversations">Você não tem conversas ativas.</p>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <!-- Coluna da Direita: Área de Conversa -->
+            <main class="chat-main-area">
+                {% if active_conversation %}
+                <!-- Conteúdo da Conversa Ativa -->
+                <h2>{{ active_conversation.nome }}</h2>
+                <div id="chat-box">
+                    {% for mensagem in mensagens %}
+                    <div
+                        class="message {% if mensagem.id_remetente == request.user %}from-me{% else %}from-you{% endif %}">
+                        {% if active_conversation.is_group %}
+                        <small><strong>{{ mensagem.id_remetente.nome }}:</strong></small><br>
+                        {% endif %}
+                        {{ mensagem.mensagem }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div id="input-box">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="destinatario_id" value="{{ active_conversation.id }}">
+                        {{ form.mensagem }}
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                    >
+                </div>
+                {% else %}
+                <!-- Mensagem Inicial (Escolha alguém para conversar) -->
+                <div class="initial-message">
+                    <i class="fas fa-comment-dots"></i>
+                    <p>Escolha alguém ou um grupo para conversar</p>
+                </div>
+                {% endif %}
+            </main>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>
