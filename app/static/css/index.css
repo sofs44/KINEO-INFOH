@@ -88,15 +88,24 @@ body {
   font-size: 22px;
 }
 
+/*  */
+/* ====== SEÇÃO DA IMAGEM (draw) ====== */
 .draw {
-  background: #d87300;
-  text-align: center;
-  color: white;
-  padding: 150px 150px;
-  font-size: 18px;
-  font-size: 20px;
+  background: #d87300;   /* mantém o fundo laranja */
+  text-align: center;    /* centraliza a imagem */
+  padding: 25px 0;       /* espaço acima/abaixo */
 }
 
+
+.draw img,
+.draw .draw-img {
+  width: 250px !important;   /* força o tamanho */
+  height: auto !important;   /* mantém a proporção */
+  display: inline-block;
+}
+
+
+/*  */
 .cards {
   display: flex;
   justify-content: space-around;
