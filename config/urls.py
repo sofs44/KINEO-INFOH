@@ -18,6 +18,7 @@ urlpatterns = [
     path("chat/", views.chat_view, name="chat"),
     path('logout/', views.logout_view, name='logout'),
     path('perfil/', views.perfil_view, name='perfil'),
+    path('deletar-conta/', views.deletar_conta_view, name='deletar_conta'),
     path("preferencia/editar/<int:pk>/", views.editar_preferencia, name="editar_preferencia"),
     path("preferencia/novo/", views.editar_preferencia, name="nova_preferencia"),
     path("preferencia/deletar/<int:pk>/", views.deletar_preferencia, name="deletar_preferencia"),

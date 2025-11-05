@@ -523,3 +523,50 @@ def sobre(request):
 @login_required
 def perfil_view(request):
     return render(request, 'perfil.html')
+
+
+# view do perfil
+
+@login_required
+def perfil_view(request):
+    """
+    View para exibir e editar o perfil do usuário.
+    """
+    if request.method == "POST":
+        # Processar edição de nome, email e foto
+        nome = request.POST.get('nome')
+        email = request.POST.get('email')
+        foto = request.FILES.get('foto_perfil')
+        
+        user = request.user
+        
+        if nome:
+            user.nome = nome
+        if email:
+            user.email = email
+        if foto:
+            user.foto_perfil = foto
+        
+        user.save()
+        
+        # Redirecionar ou renderizar com mensagem de sucesso
+        return redirect('perfil')
+    
+    context = {
+        'user': request.user,
+    }
+    return render(request, 'configuracoes.html', context)
+
+# deletar conta 
+@login_required
+def deletar_conta_view(request):
+    """
+    View para deletar a conta do usuário.
+    """
+    if request.method == "POST":
+        user = request.user
+        user.delete()
+        auth_logout(request)
+        return redirect('home')
+    
+    return render(request, 'confirmar_delecao.html')

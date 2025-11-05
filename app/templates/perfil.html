@@ -5,7 +5,7 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kineo - Página Inicial</title>
+    <title>Kineo - Configurações</title>
     <link rel="stylesheet" href="{% static 'css/perfil.css' %}" />
 </head>
 
@@ -49,45 +49,270 @@
                     </span>
                 </a>
 
-
                 <label class="switch">
-                    <input type="checkbox">
+                    <input type="checkbox" id="theme-toggle">
                     <span class="slider round"></span>
                 </label>
 
-
-            {% if user.is_authenticated %}
-                <div class="user-menu">
-                    <img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
-                         alt="usuario" width="35" height="35" class="user-icon" id="user-icon">
-                
-                    <div class="dropdown" id="user-dropdown">
-                        <a href="{% url 'perfil' %}"><img src="https://img.icons8.com/?size=100&id=82751&format=png&color=000000" alt="usuário" width="25" height="25" > Perfil</a>
-                        <a href="#" id="logout-btn"><img src="https://img.icons8.com/?size=100&id=82792&format=png&color=000000" alt="logout" width="25" height="25"> Sair</a>
-                    </div>
-                </div>
-                
-                <!-- Modal de confirmação de logout -->
-                <div id="logout-modal" class="modal">
-                    <div class="modal-content">
-                        <p>Tem certeza que deseja sair?</p>
-                        <div class="modal-buttons">
-                            <button id="confirm-logout">Sim</button>
-                            <button id="cancel-logout">Cancelar</button>
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <img src="https://img.icons8.com/?size=100&id=23400&format=png&color=000000"
+                             alt="usuario" width="35" height="35" class="user-icon" id="user-icon">
+                    
+                        <div class="dropdown" id="user-dropdown">
+                            <a href="{% url 'perfil' %}"><img src="https://img.icons8.com/?size=100&id=82751&format=png&color=000000" alt="usuário" width="25" height="25" > Perfil</a>
+                            <a href="#" id="logout-btn"><img src="https://img.icons8.com/?size=100&id=82792&format=png&color=000000" alt="logout" width="25" height="25"> Sair</a>
                         </div>
                     </div>
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="login-link">Entrar</a>
-            {% endif %}
-                
+                    
+                    <!-- Modal de confirmação de logout -->
+                    <div id="logout-modal" class="modal">
+                        <div class="modal-content">
+                            <p>Tem certeza que deseja sair?</p>
+                            <div class="modal-buttons">
+                                <button id="confirm-logout">Sim</button>
+                                <button id="cancel-logout">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-link">Entrar</a>
+                {% endif %}
 
             </div>
         </div>
+    </header>
 
-        
+    <!-- CONTEÚDO PRINCIPAL DA PÁGINA DE CONFIGURAÇÕES -->
+    <main class="config-main">
+        <div class="config-container">
+            
+            <!-- SEÇÃO ESQUERDA - INFORMAÇÕES DO PERFIL -->
+            <section class="config-esquerda">
+                <div class="perfil-card">
+                    <img src="{{ user.foto_perfil.url|default:'https://via.placeholder.com/100' }}" alt="Foto de Perfil" class="foto-perfil-config">
+                    <h2>{{ user.nome }}</h2>
+                    <p class="email-perfil">{{ user.email }}</p>
+                </div>
 
-    
+                <div class="info-card">
+                    <h3>Esportes</h3>
+                    <p>{% if user.preferencias.all %}
+                        {% for pref in user.preferencias.all %}
+                            {{ pref.esportes }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Nenhum esporte definido
+                    {% endif %}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Sexo</h3>
+                    <p>{% if user.preferencias.all %}
+                        {% for pref in user.preferencias.all %}
+                            {{ pref.get_sexo_display }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Não informado
+                    {% endif %}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Nível</h3>
+                    <p>{% if user.preferencias.all %}
+                        {% for pref in user.preferencias.all %}
+                            {{ pref.get_nivel_display }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Não informado
+                    {% endif %}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Turno</h3>
+                    <p>{% if user.preferencias.all %}
+                        {% for pref in user.preferencias.all %}
+                            {{ pref.get_turno_display }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Não informado
+                    {% endif %}</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Idade do Parceiro</h3>
+                    <p>{% if user.preferencias.all %}
+                        {% for pref in user.preferencias.all %}
+                            {{ pref.idade_parc }} anos{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Não informado
+                    {% endif %}</p>
+                </div>
+            </section>
+
+            <!-- SEÇÃO DIREITA - CONFIGURAÇÕES -->
+            <section class="config-direita">
+                <h2>Configurações</h2>
+
+                <!-- Botão Editar Nome -->
+                <button class="config-btn" id="btn-editar-nome">
+                    <span class="btn-icon">✏️</span>
+                    <div class="btn-content">
+                        <strong>Editar nome, email e foto de perfil</strong>
+                        <small>Abre Modal</small>
+                    </div>
+                </button>
+
+                <!-- Botão Editar Preferências -->
+                <button class="config-btn" id="btn-editar-pref">
+                    <span class="btn-icon">⚙️</span>
+                    <div class="btn-content">
+                        <strong>Editar preferências</strong>
+                        <small>Abre Modal</small>
+                    </div>
+                </button>
+
+                <!-- Botão Apagar Conta -->
+                <button class="config-btn btn-danger" id="btn-apagar-conta">
+                    <span class="btn-icon">🗑️</span>
+                    <div class="btn-content">
+                        <strong>Apagar a conta</strong>
+                        <small>Ação irreversível</small>
+                    </div>
+                </button>
+
+                <!-- Tema Claro/Escuro -->
+                <div class="tema-section">
+                    <h3>Tema</h3>
+                    <div class="tema-toggle">
+                        <span>Tema claro / escuro</span>
+                        <label class="switch-inline">
+                            <input type="checkbox" id="theme-toggle-config">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ============================================ -->
+    <!-- MODAL 1: EDITAR NOME, EMAIL E FOTO -->
+    <!-- ============================================ -->
+    <div id="modal-editar-nome" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Editar nome, email e foto de perfil</h2>
+                <button class="modal-close" data-modal="modal-editar-nome">&times;</button>
+            </div>
+            <form id="form-editar-nome" method="POST" action="{% url 'perfil' %}" enctype="multipart/form-data" class="modal-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" value="{{ user.nome }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="foto_perfil">Foto de Perfil</label>
+                    <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*">
+                    <small>Deixe em branco para manter a foto atual</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" data-modal="modal-editar-nome">Cancelar</button>
+                    <button type="submit" class="btn-confirm">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODAL 2: EDITAR PREFERÊNCIAS -->
+    <!-- ============================================ -->
+    <div id="modal-editar-pref" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Editar preferências</h2>
+                <button class="modal-close" data-modal="modal-editar-pref">&times;</button>
+            </div>
+            <form id="form-editar-pref" method="POST" action="{% url 'editar_preferencia' pk=0 %}" class="modal-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="esportes">Esportes</label>
+                    <input type="text" id="esportes" name="esportes" placeholder="Ex: Futebol, Basquete" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sexo">Sexo</label>
+                    <select id="sexo" name="sexo" required>
+                        <option value="">Selecione...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                        <option value="O">Outro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nivel">Nível</label>
+                    <select id="nivel" name="nivel" required>
+                        <option value="">Selecione...</option>
+                        <option value="iniciante">Iniciante</option>
+                        <option value="intermediario">Intermediário</option>
+                        <option value="avancado">Avançado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="turno">Turno</label>
+                    <select id="turno" name="turno" required>
+                        <option value="">Selecione...</option>
+                        <option value="manha">Manhã</option>
+                        <option value="tarde">Tarde</option>
+                        <option value="noite">Noite</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="idade_parc">Idade do Parceiro</label>
+                    <input type="number" id="idade_parc" name="idade_parc" min="1" max="120" required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" data-modal="modal-editar-pref">Cancelar</button>
+                    <button type="submit" class="btn-confirm">Salvar Preferências</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODAL 3: CONFIRMAÇÃO DE EXCLUSÃO DE CONTA -->
+    <!-- ============================================ -->
+    <div id="modal-apagar-conta" class="modal-overlay">
+        <div class="modal-box modal-confirmation">
+            <div class="modal-header">
+                <h2>Tem certeza que quer apagar a conta?</h2>
+                <button class="modal-close" data-modal="modal-apagar-conta">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Esta ação é <strong>irreversível</strong>. Todos os seus dados serão deletados permanentemente.</p>
+                <p>Deseja continuar?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-modal="modal-apagar-conta">Cancelar</button>
+                <button type="button" class="btn-danger-confirm" id="confirm-delete-account">Sim, apagar minha conta</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="footer_itens">
             <strong>Kineo</strong><br>
@@ -136,44 +361,335 @@
             <strong><a href="{% url 'sobre' %}">Sobre Nós</a></strong>
         </div>
     </footer>
-    <script>
-        // Mostra/oculta o menu do usuário
-        const userIcon = document.getElementById('user-icon');
-        const dropdown = document.getElementById('user-dropdown');
-        const logoutBtn = document.getElementById('logout-btn');
-        const modal = document.getElementById('logout-modal');
-        const confirmLogout = document.getElementById('confirm-logout');
-        const cancelLogout = document.getElementById('cancel-logout');
-      
-        userIcon.addEventListener('click', () => {
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-      
-        // Fecha o menu se clicar fora
-        window.addEventListener('click', (e) => {
-          if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.style.display = 'none';
-          }
-        });
-      
-        // Abre o modal de confirmação
-        logoutBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          modal.style.display = 'block';
-          dropdown.style.display = 'none';
-        });
-      
-        // Confirmar logout
-        confirmLogout.addEventListener('click', () => {
-          window.location.href = "{% url 'logout' %}";
-        });
-      
-        // Cancelar logout
-        cancelLogout.addEventListener('click', () => {
-          modal.style.display = 'none';
-        });
-      </script>
-      
+
+    <script src="{% static 'js/configuracoes.js' %}"></script>
 </body>
+<script>
+    // ============================================
+// GERENCIAMENTO DE MODAIS
+// ============================================
+
+// Elementos dos botões
+const btnEditarNome = document.getElementById('btn-editar-nome');
+const btnEditarPref = document.getElementById('btn-editar-pref');
+const btnApagarConta = document.getElementById('btn-apagar-conta');
+
+// Elementos dos modais
+const modalEditarNome = document.getElementById('modal-editar-nome');
+const modalEditarPref = document.getElementById('modal-editar-pref');
+const modalApagarConta = document.getElementById('modal-apagar-conta');
+
+// Botões de fechar
+const closeButtons = document.querySelectorAll('.modal-close');
+
+// Botões de cancelar
+const cancelButtons = document.querySelectorAll('.btn-cancel');
+
+// Botão de confirmação de exclusão
+const confirmDeleteBtn = document.getElementById('confirm-delete-account');
+
+// ========== ABRIR MODAIS ==========
+btnEditarNome.addEventListener('click', () => {
+    openModal('modal-editar-nome');
+});
+
+btnEditarPref.addEventListener('click', () => {
+    openModal('modal-editar-pref');
+});
+
+btnApagarConta.addEventListener('click', () => {
+    openModal('modal-apagar-conta');
+});
+
+// ========== FECHAR MODAIS ==========
+closeButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        const modalId = e.target.getAttribute('data-modal');
+        closeModal(modalId);
+    });
+});
+
+cancelButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        const modalId = e.target.getAttribute('data-modal');
+        closeModal(modalId);
+    });
+});
+
+// ========== FECHAR MODAL AO CLICAR FORA ==========
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
+});
+
+// ========== FUNÇÕES DE ABRIR E FECHAR ==========
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Impede scroll
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Restaura scroll
+    }
+}
+
+// ========== CONFIRMAÇÃO DE EXCLUSÃO DE CONTA ==========
+confirmDeleteBtn.addEventListener('click', () => {
+    // Aqui você pode adicionar uma requisição para deletar a conta
+    // Por enquanto, vamos apenas redirecionar ou mostrar uma mensagem
+    
+    // Opção 1: Redirecionar para uma view de confirmação
+    // window.location.href = '/deletar-conta/';
+    
+    // Opção 2: Fazer uma requisição AJAX
+    fetch('/deletar-conta/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ confirm: true })
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Sua conta foi deletada com sucesso.');
+            window.location.href = '/';
+        } else {
+            alert('Erro ao deletar a conta. Tente novamente.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao processar sua solicitação.');
+    });
+});
+
+// ========== FUNÇÃO PARA OBTER CSRF TOKEN ==========
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// ============================================
+// GERENCIAMENTO DE TEMA (CLARO/ESCURO)
+// ============================================
+
+const themeToggle = document.getElementById('theme-toggle');
+const themeToggleConfig = document.getElementById('theme-toggle-config');
+
+// Sincronizar os dois toggles
+themeToggle.addEventListener('change', () => {
+    toggleTheme();
+    themeToggleConfig.checked = themeToggle.checked;
+});
+
+themeToggleConfig.addEventListener('change', () => {
+    toggleTheme();
+    themeToggle.checked = themeToggleConfig.checked;
+});
+
+// Função para alternar tema
+function toggleTheme() {
+    const isDarkMode = document.body.classList.toggle('dark-theme');
+    
+    // Salvar preferência no localStorage
+    if (isDarkMode) {
+        localStorage.setItem('theme', 'dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Carregar tema salvo ao iniciar
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeToggle.checked = true;
+        themeToggleConfig.checked = true;
+    } else {
+        document.body.classList.remove('dark-theme');
+        themeToggle.checked = false;
+        themeToggleConfig.checked = false;
+    }
+});
+
+// ============================================
+// GERENCIAMENTO DO MENU DROPDOWN
+// ============================================
+
+const userIcon = document.getElementById('user-icon');
+const userDropdown = document.getElementById('user-dropdown');
+
+if (userIcon && userDropdown) {
+    userIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!userIcon.contains(e.target) && !userDropdown.contains(e.target)) {
+            userDropdown.style.display = 'none';
+        }
+    });
+}
+
+// ============================================
+// LOGOUT
+// ============================================
+
+const logoutBtn = document.getElementById('logout-btn');
+const logoutModal = document.getElementById('logout-modal');
+const confirmLogout = document.getElementById('confirm-logout');
+const cancelLogout = document.getElementById('cancel-logout');
+
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutModal.style.display = 'block';
+    });
+}
+
+if (confirmLogout) {
+    confirmLogout.addEventListener('click', () => {
+        window.location.href = '{% url "logout" %}';
+    });
+}
+
+if (cancelLogout) {
+    cancelLogout.addEventListener('click', () => {
+        logoutModal.style.display = 'none';
+    });
+}
+
+// Fechar modal de logout ao clicar fora
+if (logoutModal) {
+    logoutModal.addEventListener('click', (e) => {
+        if (e.target === logoutModal) {
+            logoutModal.style.display = 'none';
+        }
+    });
+}
+
+// ============================================
+// VALIDAÇÃO DE FORMULÁRIOS
+// ============================================
+
+const formEditarNome = document.getElementById('form-editar-nome');
+const formEditarPref = document.getElementById('form-editar-pref');
+
+if (formEditarNome) {
+    formEditarNome.addEventListener('submit', (e) => {
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+
+        if (!nome || !email) {
+            e.preventDefault();
+            alert('Por favor, preencha todos os campos obrigatórios.');
+        }
+    });
+}
+
+if (formEditarPref) {
+    formEditarPref.addEventListener('submit', (e) => {
+        const esportes = document.getElementById('esportes').value.trim();
+        const sexo = document.getElementById('sexo').value;
+        const nivel = document.getElementById('nivel').value;
+        const turno = document.getElementById('turno').value;
+        const idadeParc = document.getElementById('idade_parc').value;
+
+        if (!esportes || !sexo || !nivel || !turno || !idadeParc) {
+            e.preventDefault();
+            alert('Por favor, preencha todos os campos.');
+        }
+
+        if (idadeParc < 1 || idadeParc > 120) {
+            e.preventDefault();
+            alert('Por favor, insira uma idade válida (1-120).');
+        }
+    });
+}
+
+// ============================================
+// PREVIEW DE IMAGEM
+// ============================================
+
+const fotoInput = document.getElementById('foto_perfil');
+const fotoPerfil = document.querySelector('.foto-perfil-config');
+
+if (fotoInput && fotoPerfil) {
+    fotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = (event) => {
+                fotoPerfil.src = event.target.result;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// ============================================
+// ATALHOS DE TECLADO
+// ============================================
+
+document.addEventListener('keydown', (e) => {
+    // Fechar modal com ESC
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+            modal.classList.remove('active');
+        });
+        document.body.style.overflow = 'auto';
+    }
+});
+
+// ============================================
+// ANIMAÇÕES DE SCROLL
+// ============================================
+
+// Adicionar animação ao carregar a página
+window.addEventListener('load', () => {
+    const cards = document.querySelectorAll('.perfil-card, .info-card, .config-btn');
+    
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+
+console.log('Configurações carregadas com sucesso!');
+
+</script>
 
 </html>
