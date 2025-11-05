@@ -178,10 +178,10 @@
                     <form method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="destinatario_id" value="{{ active_conversation.id }}">
-                        {{ form.mensagem }}
+                        <textarea name="mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea>
                         <button type="submit"><i class="fas fa-paper-plane"></i></button>
                     </form>
-                    >
+                    
                 </div>
                 {% else %}
                 <!-- Mensagem Inicial (Escolha alguém para conversar) -->
