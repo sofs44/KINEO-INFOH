@@ -76,13 +76,31 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 # PREFERÊNCIA
 # =======================
 class Preferencia(models.Model):
+    SEXO_CHOICES = [
+        ("M", "Masculino"),
+        ("F", "Feminino"),
+        ("O", "Outro"),
+    ]
+
+    NIVEL_CHOICES = [
+        ("I", "Iniciante"),
+        ("M", "Intermediário"),
+        ("A", "Avançado"),
+    ]
+
+    TURNO_CHOICES = [
+        ("M", "Manhã"),
+        ("T", "Tarde"),
+        ("N", "Noite"),
+    ]
+
     id_preferencia = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="preferencias")
     esportes = models.CharField(max_length=200, blank=True)
-    sexo = models.CharField(max_length=20, blank=True)
-    nivel = models.CharField(max_length=50, blank=True)
-    turno = models.CharField(max_length=50, blank=True)
-    idade_parc = models.DateField(null=True, blank=True)
+    sexo = models.CharField(max_length=1, choices=SEXO_CHOICES, blank=True)
+    nivel = models.CharField(max_length=1, choices=NIVEL_CHOICES, blank=True)
+    turno = models.CharField(max_length=1, choices=TURNO_CHOICES, blank=True)
+    idade_parc = models.IntegerField(null=True, blank=True)  # 👈 melhor usar IntegerField
 
     class Meta:
         db_table = "preferencias"

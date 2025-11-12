@@ -138,22 +138,27 @@ def home(request):
     return render(request, "home.html", context)
 
 
+from django.http import JsonResponse, HttpResponseBadRequest
+
 @login_required
 def editar_preferencia(request, pk=None):
     if pk:
         pref = get_object_or_404(Preferencia, pk=pk, usuario=request.user)
     else:
         pref = Preferencia(usuario=request.user)
+
     if request.method == "POST":
         form = PreferenciaForm(request.POST, instance=pref)
         if form.is_valid():
             pref = form.save(commit=False)
             pref.usuario = request.user
             pref.save()
-            return redirect("home")
-    else:
-        form = PreferenciaForm(instance=pref)
-    return render(request, "editar_preferencia.html", {"form": form})
+            return JsonResponse({"success": True})
+        else:
+            return JsonResponse({"success": False, "errors": form.errors})
+    
+    return HttpResponseBadRequest("Requisição inválida")
+
 
 
 @login_required
@@ -555,7 +560,7 @@ def perfil_view(request):
     context = {
         'user': request.user,
     }
-    return render(request, 'configuracoes.html', context)
+    return render(request, 'perfil.html', context)
 
 # deletar conta 
 @login_required

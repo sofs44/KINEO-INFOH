@@ -49,10 +49,7 @@
                     </span>
                 </a>
 
-                <label class="switch">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider round"></span>
-                </label>
+                
 
                 {% if user.is_authenticated %}
                     <div class="user-menu">
@@ -182,17 +179,8 @@
                     </div>
                 </button>
 
-                <!-- Tema Claro/Escuro -->
-                <div class="tema-section">
-                    <h3>Tema</h3>
-                    <div class="tema-toggle">
-                        <span>Tema claro / escuro</span>
-                        <label class="switch-inline">
-                            <input type="checkbox" id="theme-toggle-config">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
+              
+                
             </section>
         </div>
     </main>
@@ -233,65 +221,66 @@
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- MODAL 2: EDITAR PREFERÊNCIAS -->
-    <!-- ============================================ -->
-    <div id="modal-editar-pref" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h2>Editar preferências</h2>
-                <button class="modal-close" data-modal="modal-editar-pref">&times;</button>
-            </div>
-            <form id="form-editar-pref" method="POST" action="{% url 'editar_preferencia' pk=0 %}" class="modal-form">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="esportes">Esportes</label>
-                    <input type="text" id="esportes" name="esportes" placeholder="Ex: Futebol, Basquete" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="sexo">Sexo</label>
-                    <select id="sexo" name="sexo" required>
-                        <option value="">Selecione...</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Feminino</option>
-                        <option value="O">Outro</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="nivel">Nível</label>
-                    <select id="nivel" name="nivel" required>
-                        <option value="">Selecione...</option>
-                        <option value="iniciante">Iniciante</option>
-                        <option value="intermediario">Intermediário</option>
-                        <option value="avancado">Avançado</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="turno">Turno</label>
-                    <select id="turno" name="turno" required>
-                        <option value="">Selecione...</option>
-                        <option value="manha">Manhã</option>
-                        <option value="tarde">Tarde</option>
-                        <option value="noite">Noite</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="idade_parc">Idade do Parceiro</label>
-                    <input type="number" id="idade_parc" name="idade_parc" min="1" max="120" required>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-cancel" data-modal="modal-editar-pref">Cancelar</button>
-                    <button type="submit" class="btn-confirm">Salvar Preferências</button>
-                </div>
-            </form>
+   <!-- ============================================ -->
+<!-- MODAL 2: EDITAR PREFERÊNCIAS -->
+<!-- ============================================ -->
+<div id="modal-editar-pref" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Editar preferências</h2>
+            <button class="modal-close" data-modal="modal-editar-pref">&times;</button>
         </div>
+        <form id="form-editar-pref" method="POST" class="modal-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="esportes">Esportes</label>
+                <input type="text" id="esportes" name="esportes" placeholder="Ex: Futebol, Basquete" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sexo">Sexo</label>
+                <select id="sexo" name="sexo" required>
+                    <option value="">Selecione...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                    <option value="O">Outro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="nivel">Nível</label>
+                <select id="nivel" name="nivel" required>
+                    <option value="">Selecione...</option>
+                    <option value="I">Iniciante</option>
+                    <option value="M">Intermediário</option>
+                    <option value="A">Avançado</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="turno">Turno</label>
+                <select id="turno" name="turno" required>
+                    <option value="">Selecione...</option>
+                    <option value="M">Manhã</option>
+                    <option value="T">Tarde</option>
+                    <option value="N">Noite</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="idade_parc">Idade do Parceiro</label>
+                <input type="number" id="idade_parc" name="idade_parc" min="1" max="120" required>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-modal="modal-editar-pref">Cancelar</button>
+                <button type="submit" class="btn-confirm">Salvar Preferências</button>
+            </div>
+        </form>
     </div>
+</div>
+
 
     <!-- ============================================ -->
     <!-- MODAL 3: CONFIRMAÇÃO DE EXCLUSÃO DE CONTA -->
@@ -489,50 +478,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// ============================================
-// GERENCIAMENTO DE TEMA (CLARO/ESCURO)
-// ============================================
-
-const themeToggle = document.getElementById('theme-toggle');
-const themeToggleConfig = document.getElementById('theme-toggle-config');
-
-// Sincronizar os dois toggles
-themeToggle.addEventListener('change', () => {
-    toggleTheme();
-    themeToggleConfig.checked = themeToggle.checked;
-});
-
-themeToggleConfig.addEventListener('change', () => {
-    toggleTheme();
-    themeToggle.checked = themeToggleConfig.checked;
-});
-
-// Função para alternar tema
-function toggleTheme() {
-    const isDarkMode = document.body.classList.toggle('dark-theme');
-    
-    // Salvar preferência no localStorage
-    if (isDarkMode) {
-        localStorage.setItem('theme', 'dark');
-    } else {
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// Carregar tema salvo ao iniciar
-window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        themeToggle.checked = true;
-        themeToggleConfig.checked = true;
-    } else {
-        document.body.classList.remove('dark-theme');
-        themeToggle.checked = false;
-        themeToggleConfig.checked = false;
-    }
-});
 
 // ============================================
 // GERENCIAMENTO DO MENU DROPDOWN
@@ -630,6 +575,32 @@ if (formEditarPref) {
         }
     });
 }
+
+    // Se passou pela validação, envia via AJAX
+    const formData = new FormData(formEditarPref);
+
+    fetch('/preferencia/editar/0/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Preferências salvas com sucesso!');
+            closeModal('modal-editar-pref');
+            // Aqui você pode atualizar os dados na tela sem recarregar
+        } else {
+            alert('Erro ao salvar: ' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao enviar preferências.');
+    });
+
 
 // ============================================
 // PREVIEW DE IMAGEM
