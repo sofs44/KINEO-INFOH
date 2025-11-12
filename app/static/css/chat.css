@@ -515,3 +515,234 @@ form textarea {
     }
   }
   
+
+  /* ========================================================= */
+/*  AJUSTES: barra de busca + 3 bolinhas + modais (sem quebrar layout) */
+/* ========================================================= */
+
+/* ====== Container que junta barra de busca + botões ====== */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 5px;
+}
+
+/* área principal da barra */
+.search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #ffdb93;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+}
+
+/* ====== Botões à direita (3 bolinhas + lixeira) ====== */
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: #ffdb93;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b86200;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.icon-btn:hover {
+  background: #f8c76a;
+}
+
+.icon-btn.hidden {
+  display: none !important;
+}
+
+/* ========================================================= */
+/*  MENU DROPDOWN (3 bolinhas) */
+/* ========================================================= */
+.modal-dropdown {
+  position: absolute;
+  background: #fffaf0;
+  border: 1px solid #ffb451;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  padding: 6px 0;
+}
+
+.modal-dropdown.hidden {
+  display: none;
+}
+
+.modal-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-dropdown li {
+  padding: 0;
+}
+
+.modal-dropdown li button {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  text-align: left;
+  font-size: 15px;
+  color: #333;
+  cursor: pointer;
+}
+
+.modal-dropdown li button:hover {
+  background-color: #ffe8c2;
+}
+
+/* ========================================================= */
+/*  MODAIS (Apagar conversas / Criar grupo) */
+/* ========================================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 900;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fffaf0;
+  border: 2px solid #ffaa2a;
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  z-index: 1001;
+  width: 400px;
+  max-width: 90%;
+  padding: 20px;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content h3 {
+  color: #b86200;
+  margin-top: 0;
+  text-align: center;
+}
+
+.modal-content p {
+  color: #333;
+  margin: 10px 0 20px 0;
+  text-align: center;
+}
+
+/* Botões dos modais */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary {
+  background: #ffaa2a;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #ffb84a;
+}
+
+.btn-danger {
+  background: #e84a4a;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #ff6666;
+}
+
+/* Campos e inputs do modal de criar grupo */
+#create-group-modal input,
+#create-group-modal .goal-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ffb451;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+#create-group-modal label {
+  font-weight: bold;
+  color: #b86200;
+}
+
+.users-list {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ffd4a8;
+  border-radius: 8px;
+  padding: 8px;
+  background: #fff;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.goal-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.small {
+  padding: 4px 8px;
+  font-size: 14px;
+  background: #ffdb93;
+  color: #b86200;
+}
+
+.btn.small:hover {
+  background: #ffd676;
+}
