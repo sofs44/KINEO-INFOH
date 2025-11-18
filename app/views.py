@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseBadRequest
 from django import forms
 from .models import (
     Usuario,
@@ -133,33 +133,58 @@ def logout_view(request):
 def home(request):
     context = {}
     if request.user.is_authenticated:
-        context["preferencias"] = request.user.preferencias.all()
+        # AQUI HÁ UM PONTO DE MELHORIA:
+        # Se um usuário puder ter VÁRIAS preferências, .all() está correto.
+        # Se ele só puder ter UMA, o ideal é usar .first()
+        context["preferencias"] = request.user.preferencias.all() 
         context["grupos"] = request.user.grupos.all()
     return render(request, "home.html", context)
 
 
-from django.http import JsonResponse, HttpResponseBadRequest
+# =================================================================
+# CORREÇÃO 1: View editar_preferencia
+# =================================================================
+# Em views.py, substitua sua função 'editar_preferencia' por esta:
 
 @login_required
-def editar_preferencia(request, pk=None):
-    if pk:
-        pref = get_object_or_404(Preferencia, pk=pk, usuario=request.user)
-    else:
-        pref = Preferencia(usuario=request.user)
-
-    if request.method == "POST":
-        form = PreferenciaForm(request.POST, instance=pref)
-        if form.is_valid():
-            pref = form.save(commit=False)
-            pref.usuario = request.user
-            pref.save()
-            return JsonResponse({"success": True})
-        else:
-            return JsonResponse({"success": False, "errors": form.errors})
+def editar_preferencia(request):
     
-    return HttpResponseBadRequest("Requisição inválida")
+    print("\n--- REQUISIÇÃO 'editar_preferencia' RECEBIDA ---")
 
+    try:
+        # 1. Buscamos a preferência que o usuário JÁ TEM.
+        pref_instance = request.user.preferencias.first()
+        print(f"1. Instância de preferência encontrada: {pref_instance}")
 
+        if request.method == "POST":
+            print("2. Método é POST. Processando formulário...")
+            
+            form = PreferenciaForm(request.POST, instance=pref_instance)
+            
+            if form.is_valid():
+                print("3. Formulário é VÁLIDO.")
+                pref = form.save(commit=False)
+                pref.usuario = request.user  # Garante a associação correta
+                
+                print("4. Prestes a salvar no banco de dados...")
+                pref.save()
+                print("5. SALVO COM SUCESSO!")
+                
+                return JsonResponse({"success": True})
+            else:
+                # Se o formulário for inválido, não é um 500, mas é bom sabermos
+                print(f"3. Formulário é INVÁLIDO. Erros: {form.errors.as_json()}")
+                return JsonResponse({"success": False, "errors": form.errors})
+        
+        # Se não for POST (ex: GET), o que não deveria acontecer pelo JS
+        print("2. Método NÃO é POST. Requisição inválida.")
+        return HttpResponseBadRequest("Requisição inválida (só POST é permitido)")
+
+    except Exception as e:
+        # 6. Se QUALQUER coisa quebrar, vai cair aqui!
+        print(f"!!! ERRO 500 CAPTURADO !!!\nTipo: {type(e)}\nErro: {e}")
+        # Retorna um JSON de erro em vez de quebrar
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 @login_required
 def deletar_preferencia(request, pk):
@@ -195,7 +220,7 @@ def visualizar_ranking(request):
 
 
 # =================================================================
-# VIEWS DE CHAT (MODIFICADAS/ADICIONADAS)
+# SEU CÓDIGO DE CHAT ORIGINAL (INTACTO)
 # =================================================================
 
 def chat_view(request):
@@ -525,12 +550,12 @@ def marcar_conclusao(request, desafio_id):
 def sobre(request):
     return render(request, 'sobre.html')
 
-@login_required
-def perfil_view(request):
-    return render(request, 'perfil.html')
+# =================================================================
+# CORREÇÃO 2: View perfil_view
+# =================================================================
 
-
-# view do perfil
+# Sua view original estava duplicada (linhas 503 e 514). Estou usando a versão da linha 514
+# e corrigindo-a para enviar os dados da preferência para o template.
 
 @login_required
 def perfil_view(request):
@@ -557,10 +582,26 @@ def perfil_view(request):
         # Redirecionar ou renderizar com mensagem de sucesso
         return redirect('perfil')
     
+    # --- INÍCIO DA CORREÇÃO ---
+    
+    # 1. Buscamos a preferência ÚNICA do usuário
+    #    Assumindo que um usuário só tem UMA preferência
+    preferencia = request.user.preferencias.first()
+    
+    # 2. Criamos uma instância do formulário com os dados da preferência
+    #    Isso vai pré-popular o modal de "Editar Preferências"
+    pref_form = PreferenciaForm(instance=preferencia)
+
     context = {
         'user': request.user,
+        'preferencia': preferencia,  # Enviamos o OBJETO para exibir na tela
+        'pref_form': pref_form,      # Enviamos o FORM para o modal
     }
     return render(request, 'perfil.html', context)
+    # --- FIM DA CORREÇÃO ---
+
+# =================================================================
+
 
 # deletar conta 
 @login_required

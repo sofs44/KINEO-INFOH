@@ -4,7 +4,9 @@ from app import views
 from django.conf import settings
 from django.conf.urls.static import static
 
-app_name = "kineo"
+# app_name = "kineo" 
+# REMOVIDO: Seus templates (ex: perfil.html) não estão usando o namespace "kineo".
+# Manter isso causaria um erro NoReverseMatch.
 
 urlpatterns = [
     # Admin
@@ -19,8 +21,13 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('perfil/', views.perfil_view, name='perfil'),
     path('deletar-conta/', views.deletar_conta_view, name='deletar_conta'),
-    path("preferencia/editar/<int:pk>/", views.editar_preferencia, name="editar_preferencia"),
-    path("preferencia/novo/", views.editar_preferencia, name="nova_preferencia"),
+
+    # --- CORREÇÃO AQUI ---
+    # Removemos as rotas antigas com <pk> e /novo/
+    # Adicionamos uma rota única que o seu JavaScript (em perfil.html) vai chamar
+    path("preferencia/editar/", views.editar_preferencia, name="editar_preferencia"),
+    # ---------------------
+    
     path("preferencia/deletar/<int:pk>/", views.deletar_preferencia, name="deletar_preferencia"),
     path("buscar_parceiros/", views.buscar_parceiros, name="buscar_parceiros"),
     path("ranking/", views.visualizar_ranking, name="ranking"),
