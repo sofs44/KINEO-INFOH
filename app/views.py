@@ -195,39 +195,81 @@ def deletar_preferencia(request, pk):
     return render(request, "confirm_delete.html", {"obj": pref})
 
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from datetime import date
+
+# --- Helpers de apresentação ---
+def calcular_idade(data_nascimento):
+    if not data_nascimento:
+        return None
+    hoje = date.today()
+    return hoje.year - data_nascimento.year - (
+        (hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day)
+    )
+
+def get_profile_color(usuario):
+    """
+    Placeholder para futura personalização de cor pelo usuário.
+    Quando você criar o campo, é só substituir aqui.
+    """
+    return "#ff9800"  # Laranja padrão
+
+def montar_descricao(parceiro):
+    pref = parceiro.preferencia
+    esporte = (pref.esportes if pref and pref.esportes else "Não informado")
+    nivel = (pref.get_nivel_display() if pref and pref.nivel else "Não informado")
+    idade_calc = calcular_idade(parceiro.usuario.idade)
+    idade_txt = f"{idade_calc} anos" if idade_calc is not None else "Não informada"
+    local = parceiro.localizacao if parceiro.localizacao else "Não informada"
+    return f"Esporte: {esporte} | Idade: {idade_txt} | Nível: {nivel} | Localização: {local}"
+
 @login_required
 def buscar_parceiros(request):
     form = ParceiroSearchForm(request.GET or None)
-    parceiros = Parceiro.objects.select_related("usuario", "preferencia").all()
+    qs = Parceiro.objects.select_related("usuario", "preferencia").all()
+
     if form.is_valid():
-        termo = form.cleaned_data.get("termo")
-        localizacao = form.cleaned_data.get("localizacao")
-        esporte = form.cleaned_data.get("esporte")
+        termo = form.cleaned_data.get("termo", "")
+        localizacao = form.cleaned_data.get("localizacao", "")
+        esporte = form.cleaned_data.get("esporte", "")
+
         if termo:
-            parceiros = parceiros.filter(
-                Q(usuario__username__icontains=termo) | Q(preferencia__esportes__icontains=termo)
+            # Corrigido: o campo do seu Usuario é 'nome' (não 'username')
+            qs = qs.filter(
+                Q(usuario__nome__icontains=termo) |
+                Q(preferencia__esportes__icontains=termo)
             )
+
         if localizacao:
-            parceiros = parceiros.filter(localizacao__icontains=localizacao)
+            qs = qs.filter(localizacao__icontains=localizacao)
+
         if esporte:
-            parceiros = parceiros.filter(preferencia__esportes__icontains=esporte)
-    return render(request, "buscar_parceiros.html", {"form": form, "parceiros": parceiros})
+            qs = qs.filter(preferencia__esportes__icontains=esporte)
 
+    # Monta dados de apresentação
+    parceiros = []
+    for p in qs:
+        parceiros.append({
+            "nome": p.usuario.nome,
+            "foto_url": p.usuario.foto_perfil.url if p.usuario.foto_perfil else None,
+            "cor_avatar": get_profile_color(p.usuario),
+            "descricao": montar_descricao(p),
+        })
 
+    # Exibe mensagem amigável quando não houver resultados
+    sem_resultados = (len(parceiros) == 0)
+    return render(
+        request,
+        "buscar_parceiros.html",
+        {"form": form, "parceiros": parceiros, "sem_resultados": sem_resultados}
+    )
 def visualizar_ranking(request):
     ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:50]
     return render(request, "ranking.html", {"ranking_list": ranking_list})
 
-
-# =================================================================
-# SEU CÓDIGO DE CHAT ORIGINAL (INTACTO)
-# =================================================================
-
 def chat_view(request):
-    """
-    View principal do chat. Exibe a lista de conversas (amigos e grupos)
-    se o usuário estiver logado. Caso contrário, exibe a mensagem de login.
-    """
+
     if not request.user.is_authenticated:
         # Renderiza a mensagem de não logado (que estará no template chat.html)
         return render(request, "chat.html", {"is_authenticated": False})

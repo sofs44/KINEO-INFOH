@@ -21,6 +21,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('perfil/', views.perfil_view, name='perfil'),
     path('deletar-conta/', views.deletar_conta_view, name='deletar_conta'),
+    path("buscar_parceiros/", views.buscar_parceiros, name="buscar_parceiros"),
 
     # --- CORREÇÃO AQUI ---
     # Removemos as rotas antigas com <pk> e /novo/

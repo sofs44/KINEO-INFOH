@@ -272,6 +272,46 @@ document.addEventListener('DOMContentLoaded', function () {
       // ajustar init
       adjust();
     }
-  });
+
+        // Mostra/oculta o menu do usuário
+        const userIcon = document.getElementById('user-icon');
+        const dropdown = document.getElementById('user-dropdown');
+        const logoutBtn = document.getElementById('logout-btn');
+        const modal = document.getElementById('logout-modal');
+        const confirmLogout = document.getElementById('confirm-logout');
+        const cancelLogout = document.getElementById('cancel-logout');
+      
+        userIcon.addEventListener('click', () => {
+          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+      
+        // Fecha o menu se clicar fora
+        window.addEventListener('click', (e) => {
+          if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+          }
+        });
+      
+        // Abre o modal de confirmação
+        logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          modal.style.display = 'block';
+          dropdown.style.display = 'none';
+        });
+      
+        // Confirmar logout
+        confirmLogout.addEventListener('click', () => {
+          window.location.href = "{% url 'logout' %}";
+        });
+      
+        // Cancelar logout
+        cancelLogout.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+    
+  }
+);
+
+  
   
   

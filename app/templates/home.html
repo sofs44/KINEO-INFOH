@@ -14,6 +14,7 @@
         <div class="menu">
             <img src="{% static 'Assets/logo.png' %}" alt="Logo" class="logo" />
             <div class="icons">
+            <a href="{% url 'buscar_parceiros' %}">
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 53 57" fill="none"
                         xmlns="http://www.w3.org/2000/svg" alt="lupa">
                         <path
@@ -22,7 +23,7 @@
                     </svg>
 
                 </span>
-
+            </a>
                 <a href="{% url 'ranking' %}">
                     <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
                             xmlns="http://www.w3.org/2000/svg" alt="rank">

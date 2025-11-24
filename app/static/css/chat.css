@@ -1,37 +1,46 @@
-/* Estilos globais e reset */
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background: #ffffff;
+    background: #fff;
     color: #222;
-    font-size: 16px; 
-    min-height: 100vh;
+    font-size: 20px;
+  }
+  
+  .menu {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    padding: 50px 100px;
+    align-items: center;
+  }
+  
+  .logo {
+    height: 60px !important; /* aumenta ou diminui como quiser */
+    width: auto !important;  /* mantém a proporção */
+    display: block;  
+  }
+  
+  
+  .icons {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .icon {
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
 }
 
-/* MENU (CÓDIGO FORNECIDO PELO USUÁRIO) */
-.menu {
-  display: flex;
-  justify-content: space-between;
-  padding: 50px 100px;
-  align-items: center;
-}
-
-.logo {
-  height: 60px !important;
-  width: auto !important;
-  display: block;  
-}
-
-.icons {
-  display: flex;
-  gap: 15px;
-}
-
-.icon {
-  font-size: 20px;
-  cursor: pointer;
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
 }
 
 /* CONTAINER CENTRAL (main-content) */
