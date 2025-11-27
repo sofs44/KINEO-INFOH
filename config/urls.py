@@ -12,6 +12,8 @@ urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
     path("comunidades/", views.comunidades, name="comunidades"),
+    path("criar-comunidade/", views.criar_comunidade, name="criar_comunidade"),
+
     # Rotas do seu app
     path("", views.home, name="home"), 
     path('sobre/', views.sobre, name='sobre'),

@@ -18,6 +18,9 @@ from .models import (
 from django.db.models import Q
 from django.utils import timezone
 from .models import Comunidade
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 
 # ======== Forms simples usados pelas views ========
@@ -671,3 +674,22 @@ def entrar_comunidade(request, comunidade_id):
         comunidade.membros.add(request.user)
 
     return JsonResponse({"status": "ok"})
+
+@csrf_exempt
+def criar_comunidade(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        nome = data.get("nome")
+        cor = data.get("cor")
+
+        if not nome:
+            return JsonResponse({"status": "erro", "msg": "Nome obrigatório"})
+
+        Comunidade.objects.create(
+            nome=nome,
+            cor=cor,
+            admin=request.user
+        )
+
+        return JsonResponse({"status": "ok"})
