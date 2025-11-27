@@ -17,6 +17,7 @@ from .models import (
 )
 from django.db.models import Q
 from django.utils import timezone
+from .models import Comunidade
 
 
 # ======== Forms simples usados pelas views ========
@@ -658,3 +659,15 @@ def deletar_conta_view(request):
         return redirect('home')
     
     return render(request, 'confirmar_delecao.html')
+
+def comunidades(request):
+    comunidades = Comunidade.objects.all()
+    return render(request, "comunidades.html", {"comunidades": comunidades})
+
+def entrar_comunidade(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    if request.user not in comunidade.membros.all():
+        comunidade.membros.add(request.user)
+
+    return JsonResponse({"status": "ok"})

@@ -11,6 +11,7 @@ from .models import (
     Conclusao,
     Grupo,
     GrupoAdmin,
+    Comunidade
 )
 
 
@@ -86,3 +87,8 @@ class ConclusaoAdmin(admin.ModelAdmin):
 
 # Registrar Usuario usando UsuarioAdmin
 admin.site.register(Usuario, UsuarioAdmin)
+
+@admin.register(Comunidade)
+class ComunidadeAdmin(admin.ModelAdmin):
+    list_display = ("nome", "admin", "cor", "total_membros")
+    filter_horizontal = ("membros",)

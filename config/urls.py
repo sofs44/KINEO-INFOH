@@ -11,7 +11,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
-
+    path("comunidades/", views.comunidades, name="comunidades"),
     # Rotas do seu app
     path("", views.home, name="home"), 
     path('sobre/', views.sobre, name='sobre'),

@@ -5,11 +5,9 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.utils import timezone
+from django.contrib.auth.models import User
+from django.conf import settings
 
-
-# =======================
-# MANAGER PERSONALIZADO
-# =======================
 class UsuarioManager(BaseUserManager):
     def create_user(self, nome, password=None, email=None, **extra_fields):
         if not nome:
@@ -37,17 +35,12 @@ class UsuarioManager(BaseUserManager):
 
         return self.create_user(nome, password=password, email=email, **extra_fields)
 
-
-# =======================
-# MODEL USUÁRIO
-# =======================
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id_usuario = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=150, unique=True)  # 👈 será o username
     email = models.EmailField(unique=True, null=True, blank=True)
     idade = models.DateField(null=True, blank=True)
 
-    # Foto de perfil opcional
     foto_perfil = models.ImageField(
         upload_to='profile_pics/',
         null=True,
@@ -59,9 +52,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    # ⚙️ Configurações de autenticação
-    USERNAME_FIELD = "nome"           # campo usado para login
-    REQUIRED_FIELDS = ["email"]       # campo obrigatório ao criar superuser
+    USERNAME_FIELD = "nome"
+    REQUIRED_FIELDS = ["email"]
 
     objects = UsuarioManager()
 
@@ -71,10 +63,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.nome
 
-
-# =======================
-# PREFERÊNCIA
-# =======================
 class Preferencia(models.Model):
     SEXO_CHOICES = [
         ("M", "Masculino"),
@@ -108,10 +96,6 @@ class Preferencia(models.Model):
     def __str__(self):
         return f"Pref {self.id_preferencia} - {self.usuario.nome}"
 
-
-# =======================
-# PARCEIRO
-# =======================
 class Parceiro(models.Model):
     id_parceiros = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="parceiros")
@@ -124,10 +108,6 @@ class Parceiro(models.Model):
     def __str__(self):
         return f"Parceiro {self.id_parceiros} - {self.usuario.nome}"
 
-
-# =======================
-# RANKING
-# =======================
 class Ranking(models.Model):
     id_ranking = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="rankings")
@@ -140,10 +120,6 @@ class Ranking(models.Model):
     def __str__(self):
         return f"{self.usuario.nome} - {self.pontuacao_total}"
 
-
-# =======================
-# MENSAGEM (INDIVIDUAL)
-# =======================
 class Mensagem(models.Model):
     id_mensagem = models.AutoField(primary_key=True)
     id_remetente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="mensagens_enviadas")
@@ -158,10 +134,6 @@ class Mensagem(models.Model):
     def __str__(self):
         return f"De {self.id_remetente.nome} para {self.id_destinatario.nome} - {self.hora}"
 
-
-# =======================
-# GRUPO
-# =======================
 class Grupo(models.Model):
     id_grupo = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=200)
@@ -176,10 +148,6 @@ class Grupo(models.Model):
     def __str__(self):
         return self.nome
 
-
-# =======================
-# MENSAGEM (GRUPO) - NOVO MODELO
-# =======================
 class MensagemGrupo(models.Model):
     id_mensagem = models.AutoField(primary_key=True)
     id_grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name="mensagens")
@@ -194,10 +162,6 @@ class MensagemGrupo(models.Model):
     def __str__(self):
         return f"Em {self.id_grupo.nome} de {self.id_remetente.nome} - {self.hora}"
 
-
-# =======================
-# ADMIN DE GRUPO
-# =======================
 class GrupoAdmin(models.Model):
     id = models.AutoField(primary_key=True)
     grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name="admins")
@@ -210,10 +174,6 @@ class GrupoAdmin(models.Model):
     def __str__(self):
         return f"Admin {self.usuario.nome} de {self.grupo.nome}"
 
-
-# =======================
-# DESAFIO
-# =======================
 class Desafio(models.Model):
     id_desafio = models.AutoField(primary_key=True)
     id_grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name="desafios")
@@ -228,10 +188,6 @@ class Desafio(models.Model):
     def __str__(self):
         return f"{self.titulo} ({self.id_grupo.nome})"
 
-
-# =======================
-# CONCLUSÃO
-# =======================
 class Conclusao(models.Model):
     id_conclusao = models.AutoField(primary_key=True)
     id_desafio = models.ForeignKey(Desafio, on_delete=models.CASCADE, related_name="conclusoes")
@@ -245,3 +201,23 @@ class Conclusao(models.Model):
     def __str__(self):
         return f"{self.id_usuario.nome} concluiu {self.id_desafio.titulo}"
 
+class Comunidade(models.Model):
+    nome = models.CharField(max_length=100)
+    admin = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='comunidades_admin'
+    )
+    membros = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='comunidades'
+    )
+    cor = models.CharField(max_length=20, default="#FFB6C1")  # cor da caixa
+
+    @property
+    def total_membros(self):
+        return self.membros.count()
+
+
+    def __str__(self):
+        return self.nome
