@@ -17,10 +17,12 @@ from .models import (
 )
 from django.db.models import Q
 from django.utils import timezone
-from .models import Comunidade
+from .models import Comunidade, MetaComunidade
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
+from django.db import ProgrammingError
+
 
 
 # ======== Forms simples usados pelas views ========
@@ -652,9 +654,6 @@ def perfil_view(request):
 # deletar conta 
 @login_required
 def deletar_conta_view(request):
-    """
-    View para deletar a conta do usuário.
-    """
     if request.method == "POST":
         user = request.user
         user.delete()
@@ -673,7 +672,8 @@ def entrar_comunidade(request, comunidade_id):
     if request.user not in comunidade.membros.all():
         comunidade.membros.add(request.user)
 
-    return JsonResponse({"status": "ok"})
+    # redireciona para a página de metas da comunidade
+    return redirect('metas', comunidade_id=comunidade.id)
 
 @csrf_exempt
 def criar_comunidade(request):
@@ -693,3 +693,212 @@ def criar_comunidade(request):
         )
 
         return JsonResponse({"status": "ok"})
+
+from django.db import ProgrammingError
+from datetime import timedelta
+
+def formatar_tempo(td: timedelta):
+    dias = td.days
+    horas, resto = divmod(td.seconds, 3600)
+    minutos, segundos = divmod(resto, 60)
+    # Se não tiver dias, usa apenas HH:MM:SS
+    if dias and dias > 0:
+        return f"{dias} {horas:02}:{minutos:02}:{segundos:02}"
+    return f"{horas:02}:{minutos:02}:{segundos:02}"
+
+def cor_escura(hex_cor: str) -> bool:
+    hex_cor = (hex_cor or "").lstrip('#')
+    if len(hex_cor) != 6:
+        return False  # fallback: trata como claro
+    r, g, b = (int(hex_cor[i:i+2], 16) for i in (0, 2, 4))
+    luminancia = 0.299 * r + 0.587 * g + 0.114 * b
+    return luminancia < 128
+
+def metas_view(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    try:
+        metas = MetaComunidade.objects.filter(comunidade=comunidade)
+    except ProgrammingError:
+        metas = MetaComunidade.objects.none()
+
+    sem_metas = not metas.exists()
+
+    # Formata e marca cumprimento pelo usuário
+    for meta in metas:
+        meta.tempo_limite_formatado = formatar_tempo(meta.tempo_limite)
+        meta.foi_cumprida_pelo_usuario = (
+            request.user.is_authenticated and
+            meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
+        )
+
+    # Ranking
+    pontos = {}
+    for meta in metas:
+        for usuario in meta.usuarios_cumpriram.all():
+            pontos[usuario] = pontos.get(usuario, 0) + 1
+
+    ranking = sorted(pontos.items(), key=lambda x: x[1], reverse=True)
+
+    colocacao = None
+    for i, (usuario, score) in enumerate(ranking, start=1):
+        if usuario == request.user:
+            colocacao = i
+            break
+
+    # Tema da comunidade: cor de fundo e cor de fonte com contraste
+    cor_bg = comunidade.cor  # exemplo '#ff66cc'
+    cor_fg = "#fff" if cor_escura(cor_bg) else "#000"
+
+    context = {
+        'comunidade': comunidade,
+        'metas': metas,
+        'colocacao': colocacao if colocacao else "Sem colocação",
+        'ranking': ranking,
+        'sem_metas': sem_metas,
+        'is_admin': request.user == comunidade.admin,
+        'cor_bg': cor_bg,
+        'cor_fg': cor_fg,
+    }
+    return render(request, 'metas.html', context)
+
+
+@login_required
+def sair_comunidade(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    if request.method == "POST":
+        comunidade.membros.remove(request.user)
+        return redirect("comunidades")  # volta para a lista de comunidades
+
+    # Se alguém acessar via GET, só redireciona
+    return redirect("comunidades")
+
+@login_required
+def cumprir_meta(request, meta_id):
+    meta = get_object_or_404(MetaComunidade, id=meta_id)
+
+    if request.method == "POST":
+        meta.usuarios_cumpriram.add(request.user)
+        return redirect("metas", comunidade_id=meta.comunidade.id)
+
+    return redirect("metas", comunidade_id=meta.comunidade.id)
+
+
+class MetaForm(forms.ModelForm):
+    class Meta:
+        model = MetaComunidade
+        fields = ['titulo', 'tempo_limite']
+        widgets = {
+            'tempo_limite': forms.TextInput(attrs={'placeholder': 'Ex: 3 days, 2:00:00'}),
+        }
+
+@login_required
+def adicionar_meta(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    if request.user != comunidade.admin:
+        return HttpResponseForbidden("Você não tem permissão para adicionar metas.")
+
+    if request.method == "POST":
+        form = MetaForm(request.POST)
+        if form.is_valid():
+            meta = form.save(commit=False)
+            meta.comunidade = comunidade
+            meta.save()
+            return redirect('metas', comunidade_id=comunidade.id)
+    else:
+        form = MetaForm()
+
+    return render(request, 'adicionar_meta.html', {'form': form, 'comunidade': comunidade})
+
+@csrf_exempt
+@login_required
+def criar_meta_ajax(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    if request.user != comunidade.admin:
+        return JsonResponse({"status": "erro", "msg": "Sem permissão"})
+
+    if request.method == "POST":
+        titulo = request.POST.get("titulo")
+        tempo_raw = request.POST.get("tempo_limite")
+
+        try:
+            tempo_limite = eval(f"datetime.timedelta({tempo_raw})")
+        except:
+            return JsonResponse({"status": "erro", "msg": "Formato de tempo inválido"})
+
+        MetaComunidade.objects.create(
+            comunidade=comunidade,
+            titulo=titulo,
+            tempo_limite=tempo_limite
+        )
+
+        return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "erro", "msg": "Método inválido"})
+
+@login_required
+def sair_comunidade(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    if request.method == "POST":
+        comunidade.membros.remove(request.user)
+        return redirect("comunidades")
+
+    return redirect("comunidades")
+
+import datetime
+
+def parse_tempo_limite(texto):
+    """
+    Converte 'HH:MM:SS' ou 'DD HH:MM:SS' em timedelta.
+    Exemplos:
+      - '02:30:00' -> 2h30m
+      - '3 01:00:00' -> 3 dias e 1 hora
+    """
+    try:
+        partes = texto.strip().split()
+        if len(partes) == 1:
+            # HH:MM:SS
+            h, m, s = map(int, partes[0].split(":"))
+            return datetime.timedelta(hours=h, minutes=m, seconds=s)
+        elif len(partes) == 2:
+            # DD HH:MM:SS
+            d = int(partes[0])
+            h, m, s = map(int, partes[1].split(":"))
+            return datetime.timedelta(days=d, hours=h, minutes=m, seconds=s)
+        else:
+            return None
+    except Exception:
+        return None
+
+@login_required
+def criar_meta_ajax(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    if request.user != comunidade.admin:
+        return JsonResponse({"status": "erro", "msg": "Sem permissão"}, status=403)
+
+    if request.method == "POST":
+        titulo = request.POST.get("titulo", "").strip()
+        tempo_raw = request.POST.get("tempo_limite", "").strip()
+
+        if not titulo:
+            return JsonResponse({"status": "erro", "msg": "Título é obrigatório"}, status=400)
+
+        td = parse_tempo_limite(tempo_raw)
+        if td is None:
+            return JsonResponse({"status": "erro", "msg": "Formato de tempo inválido. Use HH:MM:SS ou DD HH:MM:SS"}, status=400)
+
+        MetaComunidade.objects.create(
+            comunidade=comunidade,
+            titulo=titulo,
+            tempo_limite=td
+        )
+
+        return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "erro", "msg": "Método inválido"}, status=405)
+

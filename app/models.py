@@ -7,6 +7,11 @@ from django.contrib.auth.models import (
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.conf import settings
+from django.db import models
+
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, nome, password=None, email=None, **extra_fields):
@@ -203,21 +208,38 @@ class Conclusao(models.Model):
 
 class Comunidade(models.Model):
     nome = models.CharField(max_length=100)
+    cor = models.CharField(max_length=20, default="#0066ff")
+
+    # administrador da comunidade
     admin = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='comunidades_admin'
+        related_name="comunidades_admin"
     )
+
+    # membros da comunidade
     membros = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        related_name='comunidades'
+        related_name="comunidades_membro",
+        blank=True
     )
-    cor = models.CharField(max_length=20, default="#FFB6C1")  # cor da caixa
 
-    @property
     def total_membros(self):
         return self.membros.count()
 
-
     def __str__(self):
         return self.nome
+
+class MetaComunidade(models.Model):
+    comunidade = models.ForeignKey(Comunidade, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100)
+    tempo_limite = models.DurationField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+    usuarios_cumpriram = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
+
+    def tempo_restante(self):
+        limite = self.criado_em + self.tempo_limite
+        return limite - timezone.now()
+
+    def __str__(self):
+        return self.titulo

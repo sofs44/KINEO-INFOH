@@ -14,6 +14,13 @@ urlpatterns = [
     path("comunidades/", views.comunidades, name="comunidades"),
     path("criar-comunidade/", views.criar_comunidade, name="criar_comunidade"),
 
+    path("comunidade/<int:comunidade_id>/metas/", views.metas_view, name="metas"),
+    path("entrar_comunidade/<int:comunidade_id>/", views.entrar_comunidade, name="entrar_comunidade"),
+    path("sair_comunidade/<int:comunidade_id>/", views.sair_comunidade, name="sair_comunidade"),
+    path("meta/<int:meta_id>/cumprir/", views.cumprir_meta, name="cumprir_meta"),
+    path("comunidade/<int:comunidade_id>/adicionar_meta/", views.adicionar_meta, name="adicionar_meta"),
+    path("comunidade/<int:comunidade_id>/criar_meta_ajax/", views.criar_meta_ajax, name="criar_meta_ajax"),
+
     # Rotas do seu app
     path("", views.home, name="home"), 
     path('sobre/', views.sobre, name='sobre'),

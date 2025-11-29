@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 }); // DOMContentLoaded end
 
 document.getElementById("confirmarEntrada").addEventListener("click", function () {
-  const comunidadeId = modalEntrar.getAttribute("data-id");
+  const comunidadeId = document.getElementById("modalEntrar").getAttribute("data-id");
   if (comunidadeId) {
     window.location.href = `/comunidade/${comunidadeId}/metas/`;
   }

@@ -88,7 +88,10 @@ class ConclusaoAdmin(admin.ModelAdmin):
 # Registrar Usuario usando UsuarioAdmin
 admin.site.register(Usuario, UsuarioAdmin)
 
+from django.contrib import admin
+from .models import Comunidade
+
 @admin.register(Comunidade)
 class ComunidadeAdmin(admin.ModelAdmin):
-    list_display = ("nome", "admin", "cor", "total_membros")
-    filter_horizontal = ("membros",)
+    filter_horizontal = ('membros',)
+    list_display = ('id', 'nome', 'admin', 'total_membros')
