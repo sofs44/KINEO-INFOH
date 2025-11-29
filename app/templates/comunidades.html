@@ -112,18 +112,17 @@
         <div class="grade-comunidades">
             {% for c in comunidades %}
             <div class="card-comunidade" data-id="{{ c.id }}" data-nome="{{ c.nome }}"
-                data-admin="{{ c.admin.username }}" data-membros="{{ c.total_membros }}"
+                data-admin="{{ c.admin.username }}" data-membros="{{ c.total_membros }}" data-cor="{{ c.cor }}"
                 style="background-color: {{ c.cor }};">
 
                 <h3 class="nome-comunidade">{{ c.nome }}</h3>
-                <p class="admin-comunidade">Admin: {{ c.admin.username }}</p>
-
                 <div class="info-hover">
                     <p><b>Membros:</b> {{ c.total_membros }}</p>
+                    <p class="admin-comunidade"><b>Admin:</b> {{ c.admin }}</p>
                 </div>
 
-            </div>
 
+            </div>
             {% endfor %}
         </div>
 
@@ -132,28 +131,42 @@
         <div id="modalEntrar" class="modal">
             <div class="modal-content">
                 <p>Deseja entrar nesta comunidade?</p>
-                <button id="confirmarEntrada">Entrar</button>
-                <button onclick="fecharModal()">Cancelar</button>
+                <div class="modal-buttons">
+                    <button id="confirmarEntrada">Entrar</button>
+                    <button id="cancelarEntrada">Cancelar</button>
+                </div>
             </div>
         </div>
+
+
 
         <!-- Modal de criar comunidade -->
         <div id="modalCriar" class="modal">
             <div class="modal-content criar">
-                <h3>Criar Comunidade</h3>
+                <h3 class="modal-titulo">Criar Comunidade</h3>
 
-                <label>Nome:</label>
-                <input type="text" id="novoNome" placeholder="Nome da comunidade">
+                <div class="form-criar">
+                    <div class="form-linha">
+                        <label for="novoNome">Nome</label>
+                        <input type="text" id="novoNome" placeholder="Ex: Os Viajantes">
+                    </div>
 
-                <label>Cor da comunidade:</label>
-                <input type="color" id="novaCor" value="#ff8a8a">
+                    <div class="form-linha">
+                        <label for="novaCor">Cor</label>
+                        <input type="color" id="novaCor" value="#ff8a8a">
+                    </div>
 
-                <div class="modal-buttons">
-                    <button id="criarConfirmar">Criar</button>
-                    <button id="criarCancelar">Cancelar</button>
+                    <div class="modal-buttons">
+                        <button id="criarConfirmar" type="button">Criar</button>
+                        <button id="criarCancelar" type="button">Cancelar</button>
+                    </div>
                 </div>
             </div>
         </div>
+
+
+
+
 
 
 
