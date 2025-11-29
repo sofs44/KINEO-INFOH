@@ -232,27 +232,37 @@ def montar_descricao(parceiro):
 
 @login_required
 def buscar_parceiros(request):
-    form = ParceiroSearchForm(request.GET or None)
-    qs = Parceiro.objects.select_related("usuario", "preferencia").all()
+    # 1. Captura os dados direto da URL (barra de pesquisa)
+    termo = request.GET.get('termo')
+    esporte = request.GET.get('esporte')
+    localizacao = request.GET.get('localizacao')
 
-    if form.is_valid():
-        termo = form.cleaned_data.get("termo", "")
-        localizacao = form.cleaned_data.get("localizacao", "")
-        esporte = form.cleaned_data.get("esporte", "")
+    # 2. Começa pegando TODOS os usuários, menos o próprio usuário logado
+    # O prefetch_related deixa o carregamento mais rápido (otimização)
+    users = Usuario.objects.exclude(id_usuario=request.user.id_usuario).prefetch_related('preferencias', 'parceiros')
 
-        if termo:
-            # Corrigido: o campo do seu Usuario é 'nome' (não 'username')
-            qs = qs.filter(
-                Q(usuario__nome__icontains=termo) |
-                Q(preferencia__esportes__icontains=termo)
-            )
+    # 3. Aplica o filtro de pesquisa (Nome OU Esporte)
+    if termo:
+        users = users.filter(
+            Q(nome__icontains=termo) | 
+            Q(preferencias__esportes__icontains=termo)
+        ).distinct()
 
-        if localizacao:
-            qs = qs.filter(localizacao__icontains=localizacao)
+    # 4. Aplica filtro específico de Esporte (do Modal)
+    if esporte:
+        users = users.filter(preferencias__esportes__icontains=esporte).distinct()
 
-        if esporte:
-            qs = qs.filter(preferencia__esportes__icontains=esporte)
+    # 5. Aplica filtro específico de Localização (do Modal)
+    if localizacao:
+        users = users.filter(parceiros__localizacao__icontains=localizacao).distinct()
 
+    # 6. Envia para o HTML
+    context = {
+        'parceiros': users,
+        'request': request # Necessário para manter o texto na barra de busca
+    }
+
+    return render(request, "buscar_parceiros.html", context)
     # Monta dados de apresentação
     parceiros = []
     for p in qs:

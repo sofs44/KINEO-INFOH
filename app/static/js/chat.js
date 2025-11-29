@@ -1,8 +1,12 @@
 // static/js/chat.js
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ==========================================
+    // PARTE 1: LÓGICA DO CHAT (MANTIDA ORIGINAL)
+    // ==========================================
     const menuBtn = document.getElementById('menu-dots-btn');
     const menuModal = document.getElementById('menu-modal');
-    const overlay = document.getElementById('modal-overlay');
+    const overlay = document.getElementById('modal-overlay'); // Overlay do CHAT
     const startDeleteBtn = document.getElementById('start-delete-mode');
     const trashBtn = document.getElementById('trash-selected-btn');
     const convList = document.getElementById('conversations-list');
@@ -18,27 +22,37 @@ document.addEventListener('DOMContentLoaded', function () {
     const usersToAdd = document.getElementById('users-to-add');
     const addGoalBtn = document.getElementById('add-goal-btn');
   
-    // helper: get csrf from meta
+    // Helper: get csrf from meta
     function getCSRF() {
       const m = document.querySelector('meta[name="csrf-token"]');
       return m ? m.getAttribute('content') : '';
     }
   
-    // utility show/hide
-    function show(el){ el.classList.remove('hidden'); el.setAttribute('aria-hidden','false'); }
-    function hide(el){ el.classList.add('hidden'); el.setAttribute('aria-hidden','true'); }
+    // Utility show/hide (USADO SÓ PELO CHAT)
+    function show(el){ 
+        if(el) { 
+            el.classList.remove('hidden'); 
+            el.setAttribute('aria-hidden','false'); 
+            // Não forçamos display block aqui para evitar conflito se o CSS já tratar
+        } 
+    }
+    function hide(el){ 
+        if(el) { 
+            el.classList.add('hidden'); 
+            el.setAttribute('aria-hidden','true'); 
+        } 
+    }
   
-    // posicionamento do dropdown próximo à search (melhora UX)
+    // Posicionamento do dropdown próximo à search
     function positionMenuDropdown() {
       const searchBar = document.querySelector('.search-bar');
       if(!menuModal || !searchBar) return;
       const rect = searchBar.getBoundingClientRect();
-      // coloca o menu à direita do searchBar
       menuModal.style.top = (rect.bottom + window.scrollY + 8) + 'px';
       menuModal.style.left = (rect.right + window.scrollX - 60) + 'px';
     }
   
-    // abrir/fechar menu de três bolinhas
+    // Abrir/fechar menu de três bolinhas
     menuBtn && menuBtn.addEventListener('click', e => {
       positionMenuDropdown();
       if(menuModal.classList.contains('hidden')) {
@@ -61,16 +75,14 @@ document.addEventListener('DOMContentLoaded', function () {
     startDeleteBtn && startDeleteBtn.addEventListener('click', () => {
       hide(menuModal);
       sidebar.classList.add('selection-mode');
-      // mostrar checkboxes
       document.querySelectorAll('.conv-select-checkbox').forEach(cb => cb.classList.remove('hidden'));
-      // mostrar ícone de lixeira no header da busca
       const trash = document.getElementById('trash-selected-btn');
-      if(trash) show(trash);
-      // fechar menu-overlay
-      hide(menuModal);
+      if(trash) {
+          trash.classList.remove('hidden'); // Força remover hidden manualmente
+          trash.style.display = 'block';
+      }
     });
   
-    // clicar em item de conversa alterna seleção quando em selection-mode
     convList && convList.addEventListener('click', function(ev) {
       const item = ev.target.closest('.conversation-item');
       if(!item) return;
@@ -80,28 +92,25 @@ document.addEventListener('DOMContentLoaded', function () {
         checkbox.checked = !checkbox.checked;
         item.classList.toggle('selected', checkbox.checked);
         updateTrashState();
-      } else {
-        // comportamento normal do link (navegar) - nada especial
       }
     });
   
     function updateTrashState() {
       const selected = convList.querySelectorAll('.conv-select-checkbox:checked');
-      if(selected.length > 0) show(trashBtn);
-      else {
-        // se não houver selecionados, exibir só o botão de iniciar (trash permanece visível até sair do modo).
-        // aqui deixamos o botão visível, mas desativado se 0 selecionados
+      if(selected.length > 0) {
+          if(trashBtn) {
+              trashBtn.classList.remove('hidden');
+              trashBtn.disabled = false;
+          }
+      } else {
         if(trashBtn) {
-          // apenas estilização: desabilitar
           if(selected.length === 0) trashBtn.disabled = true;
           else trashBtn.disabled = false;
         }
       }
     }
   
-    // clique no ícone de lixeira -> abre modal de confirmação
     trashBtn && trashBtn.addEventListener('click', () => {
-      // se nenhum selecionado, ignora
       const selectedBoxes = convList.querySelectorAll('.conv-select-checkbox:checked');
       if(selectedBoxes.length === 0) return;
       show(confirmDeleteModal);
@@ -113,11 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
       hide(overlay);
     });
   
-    // confirmar exclusão -> envia ids para backend
     confirmYes && confirmYes.addEventListener('click', async () => {
       const selectedBoxes = convList.querySelectorAll('.conv-select-checkbox:checked');
       const ids = Array.from(selectedBoxes).map(cb => cb.closest('.conversation-item').dataset.convId);
-      // chamada ao backend (implemente a view)
       try {
         const resp = await fetch('/chat/delete_conversations/', {
           method: 'POST',
@@ -128,14 +135,12 @@ document.addEventListener('DOMContentLoaded', function () {
           body: JSON.stringify({ conversation_ids: ids })
         });
         if(resp.ok) {
-          // remover itens do DOM
           selectedBoxes.forEach(cb => {
             const item = cb.closest('.conversation-item');
             if(item) item.remove();
           });
           hide(confirmDeleteModal);
           hide(overlay);
-          // sair do modo seleção
           exitSelectionMode();
         } else {
           const text = await resp.text();
@@ -157,29 +162,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if(trashBtn) hide(trashBtn);
     }
   
-    // fechar modais com ESC
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape') {
-        hide(menuModal);
-        hide(confirmDeleteModal);
-        hide(createGroupModal);
-        hide(overlay);
-        exitSelectionMode();
-      }
-    });
-  
-    // overlay click fecha modais
-    overlay && overlay.addEventListener('click', () => {
-      hide(menuModal);
-      hide(confirmDeleteModal);
-      hide(createGroupModal);
-      hide(overlay);
-      exitSelectionMode();
-    });
-  
     // === CRIAR GRUPO ===
     createGroupBtn && createGroupBtn.addEventListener('click', () => {
-      // popular a lista de usuários a partir das conversas já carregadas no DOM
       usersToAdd.innerHTML = '';
       const items = document.querySelectorAll('.conversation-item');
       items.forEach(it => {
@@ -195,7 +179,6 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         usersToAdd.appendChild(row);
       });
-  
       show(createGroupModal);
       show(overlay);
       hide(menuModal);
@@ -206,29 +189,22 @@ document.addEventListener('DOMContentLoaded', function () {
       hide(overlay);
     });
   
-    // adicionar campo de meta
     addGoalBtn && addGoalBtn.addEventListener('click', () => {
       const div = document.createElement('div');
       div.className = 'goal-row';
       div.innerHTML = `<input name="goal[]" class="goal-input" type="text" placeholder="Nova meta"> <button type="button" class="btn small remove-goal">x</button>`;
       document.getElementById('group-goals').appendChild(div);
-  
-      // remover meta
       div.querySelector('.remove-goal').addEventListener('click', () => div.remove());
     });
   
-    // submit criar grupo -> envia para backend
     createGroupForm && createGroupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
       const groupName = form.querySelector('#group-name').value.trim();
       if(!groupName) return alert('Digite um nome para o grupo.');
-  
       const members = Array.from(form.querySelectorAll('input[name="members"]:checked')).map(n => n.value);
-      // metas
       const goals = Array.from(form.querySelectorAll('input[name="goal[]"], .goal-input')).map(g => g.value.trim()).filter(x => x);
   
-      // enviar para backend
       try {
         const resp = await fetch('/chat/create_group/', {
           method: 'POST',
@@ -236,17 +212,12 @@ document.addEventListener('DOMContentLoaded', function () {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCSRF()
           },
-          body: JSON.stringify({
-            name: groupName,
-            members,
-            goals
-          })
+          body: JSON.stringify({ name: groupName, members, goals })
         });
         if(resp.ok) {
           hide(createGroupModal);
           hide(overlay);
           alert('Grupo criado com sucesso!');
-          // opcional: recarregar lista de conversas
           location.reload();
         } else {
           const text = await resp.text();
@@ -258,60 +229,110 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   
-    // ==========================
-    // small UX: quando textarea cresce, ajusta rows automaticamente (auto-height)
     const textarea = document.getElementById('message-textarea');
     if(textarea){
       const adjust = () => {
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
-        // limita
         if(textarea.scrollHeight > 160) textarea.style.height = '160px';
       };
       textarea.addEventListener('input', adjust);
-      // ajustar init
       adjust();
     }
 
-        // Mostra/oculta o menu do usuário
-        const userIcon = document.getElementById('user-icon');
-        const dropdown = document.getElementById('user-dropdown');
-        const logoutBtn = document.getElementById('logout-btn');
-        const modal = document.getElementById('logout-modal');
-        const confirmLogout = document.getElementById('confirm-logout');
-        const cancelLogout = document.getElementById('cancel-logout');
-      
-        userIcon.addEventListener('click', () => {
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-      
-        // Fecha o menu se clicar fora
-        window.addEventListener('click', (e) => {
-          if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.style.display = 'none';
-          }
-        });
-      
-        // Abre o modal de confirmação
-        logoutBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          modal.style.display = 'block';
-          dropdown.style.display = 'none';
-        });
-      
-        // Confirmar logout
-        confirmLogout.addEventListener('click', () => {
-          window.location.href = "{% url 'logout' %}";
-        });
-      
-        // Cancelar logout
-        cancelLogout.addEventListener('click', () => {
-          modal.style.display = 'none';
-        });
+    // ==========================================
+    // PARTE 2: LÓGICA DA NAVBAR (CORRIGIDA)
+    // ==========================================
     
-  }
-);
+    // Variáveis da Navbar com prefixo 'nav' para não misturar com o chat
+    const navUserIcon = document.getElementById('user-icon');
+    const navDropdown = document.getElementById('user-dropdown');
+    const navLogoutBtn = document.getElementById('logout-btn');
+    const navLogoutModal = document.getElementById('logout-modal');
+    const navConfirmLogout = document.getElementById('confirm-logout');
+    const navCancelLogout = document.getElementById('cancel-logout');
 
+    // 1. Toggle do Menu Dropdown (Perfil/Sair)
+    if (navUserIcon && navDropdown) {
+        navUserIcon.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede que o clique feche imediatamente
+            const isVisible = navDropdown.style.display === 'block';
+            navDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Fechar ao clicar fora
+        window.addEventListener('click', (e) => {
+            if (!navUserIcon.contains(e.target) && !navDropdown.contains(e.target)) {
+                navDropdown.style.display = 'none';
+            }
+        });
+    }
+
+    // 2. Abrir Modal de Logout
+    if (navLogoutBtn && navLogoutModal) {
+        navLogoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Fecha o dropdown do usuário
+            if(navDropdown) navDropdown.style.display = 'none';
+            // Abre o modal de logout
+            navLogoutModal.style.display = 'block';
+        });
+    }
+
+    // 3. Confirmar Logout
+    if (navConfirmLogout) {
+        navConfirmLogout.addEventListener('click', () => {
+            // Pega a URL do atributo data-url que colocamos no HTML
+            const logoutUrl = navConfirmLogout.getAttribute('data-url');
+            if (logoutUrl) {
+                window.location.href = logoutUrl;
+            } else {
+                // Fallback caso o atributo falhe
+                window.location.href = '/logout/'; 
+            }
+        });
+    }
+
+    // 4. Cancelar Logout
+    if (navCancelLogout && navLogoutModal) {
+        navCancelLogout.addEventListener('click', () => {
+            navLogoutModal.style.display = 'none';
+        });
+    }
+
+    // ==========================================
+    // PARTE 3: FECHAMENTO GLOBAL DE MODAIS (ESC e OVERLAY)
+    // ==========================================
+    
+    // Fechar modais com ESC
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') {
+        // Chat Modals
+        hide(menuModal);
+        hide(confirmDeleteModal);
+        hide(createGroupModal);
+        hide(overlay);
+        exitSelectionMode();
+
+        // Navbar Modals
+        if(navDropdown) navDropdown.style.display = 'none';
+        if(navLogoutModal) navLogoutModal.style.display = 'none';
+      }
+    });
   
-  
-  
+    // Overlay click fecha modais do chat E da navbar
+    if(overlay) {
+        overlay.addEventListener('click', () => {
+            // Chat
+            hide(menuModal);
+            hide(confirmDeleteModal);
+            hide(createGroupModal);
+            hide(overlay);
+            exitSelectionMode();
+            
+            // Navbar (se estiver usando o mesmo overlay, senão ignore)
+            if(navLogoutModal) navLogoutModal.style.display = 'none';
+        });
+    }
+});

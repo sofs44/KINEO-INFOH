@@ -1,0 +1,194 @@
+/* ============================================ */
+/* ESTILOS DA NAVBAR (CABEÇALHO) */
+/* ============================================ */
+
+/* Container Principal do Menu */
+.menu {
+  display: flex;
+  justify-content: space-between;
+  padding: 50px 100px;
+  align-items: center;
+  background-color: #fff; /* Garante fundo branco se sobrepor algo */
+}
+
+/* Logo */
+.logo {
+  height: 60px !important;
+  width: auto !important;
+  display: block;
+}
+
+/* Área dos Ícones */
+.icons {
+  display: flex;
+  gap: 15px;
+  align-items: center; /* Alinha verticalmente os ícones */
+}
+
+.icon {
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; /* Melhora alinhamento de SVGs */
+}
+
+/* Link de Login (quando não logado) */
+.login-link {
+  text-decoration: none;
+  color: #d87300;
+  font-weight: bold;
+  padding: 8px 12px;
+  border: 2px solid #d87300;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.login-link:hover {
+  background-color: #d87300;
+  color: white;
+}
+
+/* ============================================ */
+/* MENU DO USUÁRIO (DROPDOWN) */
+/* ============================================ */
+
+.user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-icon {
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover; /* Garante que a foto não estique */
+}
+
+/* Caixa do menu flutuante */
+.dropdown {
+  display: none; /* Controlado pelo JS */
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 1000; /* Z-index alto para ficar acima de tudo */
+  min-width: 140px;
+}
+
+.dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #000;
+  padding: 10px 15px;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.dropdown a:hover {
+  background-color: #f2f2f2;
+}
+
+/* ============================================ */
+/* MODAL DE LOGOUT */
+/* ============================================ */
+
+.modal {
+  display: none; /* Controlado pelo JS */
+  position: fixed;
+  z-index: 2000; /* Deve ser maior que o menu */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5); /* Fundo escuro transparente */
+}
+
+.modal-content {
+  background: #fff;
+  margin: 15% auto; /* Centraliza verticalmente */
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#confirm-logout {
+  background: #d87300;
+  color: white;
+}
+
+#confirm-logout:hover {
+  background: #b56000;
+}
+
+#cancel-logout {
+  background: #ccc;
+  color: #333;
+}
+
+#cancel-logout:hover {
+  background: #bbb;
+}
+
+/* ============================================ */
+/* RESPONSIVIDADE DA NAVBAR */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+  .menu {
+      padding: 30px 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu {
+      padding: 20px 30px;
+      flex-wrap: wrap; /* Permite quebrar linha se necessário */
+  }
+
+  .icons {
+      gap: 10px;
+      flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu {
+      padding: 15px 15px;
+      flex-direction: column; /* Empilha logo e ícones no celular */
+      gap: 15px;
+  }
+
+  .logo {
+      height: 50px !important;
+  }
+
+  .icons {
+      width: 100%;
+      justify-content: space-around; /* Espalha os ícones */
+  }
+  
+  /* Ajuste do dropdown no mobile */
+  .dropdown {
+      right: 50%;
+      transform: translateX(50%); /* Centraliza o dropdown em relação ao ícone */
+  }
+}
