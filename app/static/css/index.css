@@ -11,6 +11,9 @@ body {
   justify-content: space-between;
   padding: 50px 100px;
   align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
@@ -23,6 +26,7 @@ body {
 .icons {
   display: flex;
   gap: 15px;
+  flex-wrap: wrap;
 }
 
 .icon {

@@ -31,12 +31,14 @@
 
                     </span>
                 </a>
-                <a href="{% url 'ranking' %}">
-                    <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
-                            xmlns="http://www.w3.org/2000/svg" alt="rank">
+                <a href="{% url 'ranking_global' %}">
+                    <span class="icon">
+                        <svg width="30" height="30" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            alt="rank">
                             <path d="M48.75 54.1666V27.0833M32.5 54.1666V10.8333M16.25 54.1666V37.9166" stroke="#1E1E1E"
                                 stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg></span>
+                        </svg>
+                    </span>
                 </a>
 
                 <span class="icon"><svg width="30" height="30" viewBox="0 0 65 65" fill="none"
@@ -120,49 +122,50 @@
                     <p><b>Membros:</b> {{ c.total_membros }}</p>
                     <p class="admin-comunidade"><b>Admin:</b> {{ c.admin }}</p>
                 </div>
-
-
             </div>
             {% endfor %}
         </div>
 
 
-        <!-- Modal de confirmação -->
-        <div id="modalEntrar" class="modal">
-            <div class="modal-content">
-                <p>Deseja entrar nesta comunidade?</p>
+    </div>
+
+
+    <!-- Modal de confirmação -->
+    <div id="modalEntrar" class="modal">
+        <div class="modal-content">
+            <p>Deseja entrar nesta comunidade?</p>
+            <div class="modal-buttons">
+                <button id="confirmarEntrada">Entrar</button>
+                <button id="cancelarEntrada">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal de criar comunidade -->
+    <div id="modalCriar" class="modal">
+        <div class="modal-content criar">
+            <h3 class="modal-titulo">Criar Comunidade</h3>
+
+            <div class="form-criar">
+                <div class="form-linha">
+                    <label for="novoNome">Nome</label>
+                    <input type="text" id="novoNome" placeholder="Ex: Os Viajantes">
+                </div>
+
+                <div class="form-linha">
+                    <label for="novaCor">Cor</label>
+                    <input type="color" id="novaCor" value="#ff8a8a">
+                </div>
+
                 <div class="modal-buttons">
-                    <button id="confirmarEntrada">Entrar</button>
-                    <button id="cancelarEntrada">Cancelar</button>
+                    <button id="criarConfirmar" type="button">Criar</button>
+                    <button id="criarCancelar" type="button">Cancelar</button>
                 </div>
             </div>
         </div>
-
-
-
-        <!-- Modal de criar comunidade -->
-        <div id="modalCriar" class="modal">
-            <div class="modal-content criar">
-                <h3 class="modal-titulo">Criar Comunidade</h3>
-
-                <div class="form-criar">
-                    <div class="form-linha">
-                        <label for="novoNome">Nome</label>
-                        <input type="text" id="novoNome" placeholder="Ex: Os Viajantes">
-                    </div>
-
-                    <div class="form-linha">
-                        <label for="novaCor">Cor</label>
-                        <input type="color" id="novaCor" value="#ff8a8a">
-                    </div>
-
-                    <div class="modal-buttons">
-                        <button id="criarConfirmar" type="button">Criar</button>
-                        <button id="criarCancelar" type="button">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    </div>
 
 
 
@@ -170,7 +173,7 @@
 
 
 
-        <script src="/static/js/comunidades.js"></script>
+    <script src="/static/js/comunidades.js"></script>
 
 </body>
 

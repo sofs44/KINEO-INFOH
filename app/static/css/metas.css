@@ -1,233 +1,163 @@
+/* ====== CONTAINER GERAL ====== */
 .metas-container {
-    width: 70%;
-    max-width: 800px;
+    width: 92%;
+    max-width: 1250px;
     margin: 40px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-.meta-card.cumprida {
-    opacity: 0.5;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    display: grid;
+    grid-template-columns: 1fr 300px; 
+    gap: 50px;
+    align-items: flex-start;
 }
 
-
-.titulo-comunidade {
-    font-size: 28px;
-    font-weight: bold;
-    text-align: center;
-    color: #333;
-}
-
+/* ====== LISTA DE METAS ====== */
 .metas-lista {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
-    padding-left: 40px; /* espaçamento da borda esquerda */
+    gap: 25px;
 }
 
-
+/* ====== CARD DE META ====== */
 .meta-card {
-    padding: 20px;
-    border-radius: 16px;
-    color: white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    width: 95%;
+    padding: 22px;
+    border-radius: 18px;
+    background-color: var(--comunidade-bg);
+    color: var(--comunidade-fg);
+    box-shadow: 0 5px 18px rgba(0,0,0,0.15);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .meta-card h2 {
-    font-size: 18px;
     margin: 0;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 .meta-card p {
-    font-size: 15px;
     margin: 0;
+    font-size: 15px;
 }
 
-.btn-cumprir {
-    padding: 10px 18px;
-    background: white;
-    color: #222;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+.meta-card.cumprida {
+    opacity: 0.45;
+    pointer-events: none;
 }
 
-.btn-cumprir:hover {
-    background: #f3f3f3;
-}
-
+/* ====== RANKING - LADO DIREITO ====== */
 .ranking-box {
+    background-color: var(--comunidade-bg);
+    filter: brightness(1.25); /* ✨ deixa a cor mais clara */
+    border-radius: 18px;
+    padding: 25px;
     text-align: center;
-    margin-top: 20px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.12);
+    position: sticky;
+    top: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
 .ranking-box p {
-    font-size: 16px;
-    margin-bottom: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
 }
 
+.ranking-emoji {
+    font-size: 36px;
+    display: block;
+    margin-bottom: -5px;
+}
+
+.btn-adicionar-meta,
 .btn-sair {
-    padding: 10px 20px;
-    background: #ff4d4d;
-    color: white;
+    width: 100%;
+    padding: 13px 0;
     border: none;
-    border-radius: 10px;
-    font-weight: bold;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
-}
-
-.btn-sair:hover {
-    background: #e03c3c;
-}
-
-/* Exemplo: se comunidade.cor for "azul" */
-.meta-card.azul {
-  background-color: #0066ff;
-}
-
-.meta-card.verde {
-  background-color: #00cc66;
-}
-
-.meta-card.rosa {
-  background-color: #ff66cc;
+    font-size: 15px;
 }
 .btn-adicionar-meta {
-    padding: 12px 24px;
-    background-color: #4CAF50; /* verde bonito */
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #2fbf4a;
 }
 
 .btn-adicionar-meta:hover {
-    background-color: #45a049;
+    background: #28a640;
 }
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+.btn-sair {
+    background: #ff5a5a;
 }
 
-.modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 30px 24px; /* top/bottom 30px, left/right 24px */
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-sizing: border-box; /* ESSENCIAL para respeitar padding */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    position: relative;
-    text-align: center;
+.btn-sair:hover {
+    background: #e14949;
 }
 
-
-
-.modal-content h2 {
-    margin-bottom: 20px;
-    font-size: 22px;
-    color: #333;
+/* ====== TEMA DE COR ====== */
+:root {
+    /* JS vai setar isso, mas por enquanto c.cor entra aqui */
+    --comunidade-bg: {{ c.cor }};
+    --comunidade-fg: #000;
 }
 
-.modal-content input {
-    width: 100%;
-    padding: 10px 14px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
-    box-sizing: border-box;
-}
-
-.modal-content button[type="submit"] {
-    padding: 12px 24px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
+/* ====== RESPONSIVO ====== */
+@media (max-width: 900px) {
+    .metas-container {
+        grid-template-columns: 1fr;
+    }
+    .ranking-box {
+        position: relative;
+        top: 0;
+        width: 100%;
+    }
 }
 
 
-.modal-content button[type="submit"]:hover {
-    background-color: #45a049;
-}
 
-.close {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #666;
-    cursor: pointer;
-}
+/* COPILOT */
 
-/* Layout principal: metas à esquerda, ranking à direita */
 .metas-container {
-    width: 70%;
-    max-width: 800px;
-    margin: 40px auto;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 280px;
     gap: 40px;
+    width: 90%;
+    margin: 40px auto;
 }
 
 .metas-lista {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     gap: 24px;
     padding-left: 20px;
 }
 
 .ranking-box {
-    position: sticky;
-    top: 100px;
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ranking-card {
+    background-color: var(--ranking-bg);
+    color: var(--comunidade-fg);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
 }
 
-/* Tema da comunidade aplicado via variáveis */
-:root {
-    --comunidade-bg: #ffffff;
-    --comunidade-fg: #000000;
-}
-
-.tema-comunidade .meta-card {
+.meta-card {
     background-color: var(--comunidade-bg);
     color: var(--comunidade-fg);
-}
-
-/* Card de meta */
-.meta-card {
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -236,44 +166,249 @@
     gap: 12px;
 }
 
-/* Estado cumprida */
 .meta-card.cumprida {
     opacity: 0.5;
-    transition: opacity 0.3s ease;
     pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
-/* Botões */
-.btn-adicionar-meta {
+.btn-adicionar-meta,
+.btn-sair {
     padding: 10px 18px;
-    background: #4CAF50;
-    color: #fff;
     border: none;
     border-radius: 10px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.btn-adicionar-meta {
+    background-color: #4CAF50;
+    color: white;
 }
 
 .btn-adicionar-meta:hover {
-    background: #45a049;
+    background-color: #45a049;
 }
 
 .btn-sair {
-    padding: 10px 20px;
-    background: #ff4d4d;
+    background-color: #ff4d4d;
     color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
 }
 
 .btn-sair:hover {
-    background: #e03c3c;
+    background-color: #e03c3c;
 }
-.tema-comunidade .meta-card {
-    background-color: var(--comunidade-bg);
-    color: var(--comunidade-fg);
+
+@media (max-width: 768px) {
+  .menu {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .menu .icons {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .topo-comunidade {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .grade-comunidades {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 30px;
+    justify-items: center;
+  }
+
+  .card-comunidade {
+    width: 90%;
+    max-width: 320px;
+  }
+
+  .nome-comunidade {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  #pesquisa {
+    width: 100% !important;
+  }
+
+  #btnAdd {
+    align-self: flex-end;
+  }
 }
+
+.ranking-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f7fff7;
+}
+
+.ranking-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.ranking-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  background: #23a36e; /* verde padrão */
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ranking-actions .btn:hover {
+  background: #1b865a;
+}
+
+/* Se quiser variantes, mantenha o mesmo tamanho */
+.btn--secondary { background: #2f80ed; }
+.btn--danger    { background: #d64a4a; }
+
+/* Layout geral */
+.page-content {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr; /* metas à esquerda, ranking à direita */
+  gap: 20px;
+  align-items: start;
+}
+
+/* Lista de metas */
+.metas-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.meta-card {
+  background: #ffe4ef; /* seu rosa */
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Ranking box à direita */
+.ranking-card {
+  background: #e6fff0; /* seu verde claro */
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Ações: mesmo tamanho para todos os botões */
+.ranking-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.ranking-actions .btn,
+.btn-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  color: #fff;
+  background: #23a36e;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ranking-actions .btn:hover,
+.btn-meta:hover {
+  background: #1b865a;
+}
+
+.btn--secondary { background: #2f80ed; }
+.btn--danger    { background: #d64a4a; }
+
+/* Medidor simples de colocação quando não for 1–3 */
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #23a36e;
+  color: #fff;
+  font-weight: 700;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.metas-container {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+

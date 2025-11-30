@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     {% load static %}
@@ -25,7 +25,16 @@
                     </svg>
                 </span>
             </a>
-            
+            <a href="{% url 'ranking_global' %}">
+                    <span class="icon">
+                        <svg width="30" height="30" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            alt="rank">
+                            <path d="M48.75 54.1666V27.0833M32.5 54.1666V10.8333M16.25 54.1666V37.9166" stroke="#1E1E1E"
+                                stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </a>
+    
 
             <span class="icon">
                  <svg width="30" height="30" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg" alt="sino">
@@ -434,7 +443,6 @@
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         });
 
-        // Fecha o menu se clicar fora
         window.addEventListener('click', (e) => {
             if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.style.display = 'none';
@@ -443,25 +451,21 @@
     }
 
     if (logoutBtn && modal) {
-        // Abre o modal de confirmação
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             modal.style.display = 'block';
             dropdown.style.display = 'none';
         });
 
-        // Confirmar logout
         confirmLogout.addEventListener('click', () => {
             window.location.href = "{% url 'logout' %}";
         });
 
-        // Cancelar logout
         cancelLogout.addEventListener('click', () => {
             modal.style.display = 'none';
         });
     }
 </script>
 </body>
-<!-- <span class="position-number">{{ forloop.counter }}</span>   obglh q faz mostra as posições  -->
 
 </html>

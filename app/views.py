@@ -280,9 +280,19 @@ def buscar_parceiros(request):
         "buscar_parceiros.html",
         {"form": form, "parceiros": parceiros, "sem_resultados": sem_resultados}
     )
-def visualizar_ranking(request):
-    ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:50]
-    return render(request, "ranking.html", {"ranking_list": ranking_list})
+def visualizar_ranking(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    ranking_list = Ranking.objects.filter(
+        usuario__comunidades__id=comunidade.id  # ou outro campo que relacione usuário à comunidade
+    ).select_related("usuario").order_by("-pontuacao_total")[:50]
+
+    return render(request, "ranking.html", {
+        "ranking_list": ranking_list,
+        "comunidade": comunidade,
+        "user": request.user
+    })
+
 
 def chat_view(request):
 
@@ -724,53 +734,103 @@ def cor_escura(hex_cor: str) -> bool:
     luminancia = 0.299 * r + 0.587 * g + 0.114 * b
     return luminancia < 128
 
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from app.models import Comunidade, MetaComunidade, Ranking
+
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from app.models import Comunidade, MetaComunidade, Ranking
+
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from app.models import Comunidade, MetaComunidade, Ranking
+
 def metas_view(request, comunidade_id):
     comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+    metas = MetaComunidade.objects.filter(comunidade=comunidade)
 
-    try:
-        metas = MetaComunidade.objects.filter(comunidade=comunidade)
-    except ProgrammingError:
-        metas = MetaComunidade.objects.none()
-
-    sem_metas = not metas.exists()
-
-    # Formata e marca cumprimento pelo usuário
-    for meta in metas:
-        meta.tempo_limite_formatado = formatar_tempo(meta.tempo_limite)
-        meta.foi_cumprida_pelo_usuario = (
-            request.user.is_authenticated and
-            meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
-        )
-
-    # Ranking
+    # Pontos por metas cumpridas
     pontos = {}
     for meta in metas:
         for usuario in meta.usuarios_cumpriram.all():
             pontos[usuario] = pontos.get(usuario, 0) + 1
 
-    ranking = sorted(pontos.items(), key=lambda x: x[1], reverse=True)
+    # Atualiza ranking
+    for usuario, score in pontos.items():
+        ranking_obj, _ = Ranking.objects.get_or_create(usuario=usuario)
+        ranking_obj.pontuacao_total = score
+        ranking_obj.save()
 
+    # Colocação do usuário
     colocacao = None
-    for i, (usuario, score) in enumerate(ranking, start=1):
-        if usuario == request.user:
-            colocacao = i
-            break
+    if request.user.is_authenticated:
+        ranking_ordenado = sorted(pontos.items(), key=lambda x: x[1], reverse=True)
+        for i, (usuario, score) in enumerate(ranking_ordenado, start=1):
+            if usuario == request.user:
+                colocacao = i
+                break
 
-    # Tema da comunidade: cor de fundo e cor de fonte com contraste
-    cor_bg = comunidade.cor  # exemplo '#ff66cc'
-    cor_fg = "#fff" if cor_escura(cor_bg) else "#000"
+    # Tempo restante (aceita deadline DateTimeField ou DurationField somado ao criado_em)
+    now = timezone.now()
+    for meta in metas:
+        deadline = None
+        # Dentro do loop de metas:
+        deadline = meta.criado_em + meta.tempo_limite
+        delta = deadline - timezone.now()
+        total = int(delta.total_seconds())
+        meta.tempo_limite_formatado = f"{total // 3600} h {(total % 3600) // 60} m {total 
+
+        # prazo_final: DateTimeField (se existir)
+        if hasattr(meta, "prazo_final") and getattr(meta, "prazo_final"):
+            deadline = meta.prazo_final
+            if timezone.is_naive(deadline):
+                deadline = timezone.make_aware(deadline, timezone.get_current_timezone())
+
+        # tempo_limite: DurationField (se existir)
+        elif hasattr(meta, "tempo_limite") and getattr(meta, "tempo_limite"):
+            criado = meta.criado_em
+            if timezone.is_naive(criado):
+                criado = timezone.make_aware(criado, timezone.get_current_timezone())
+            deadline = criado + meta.tempo_limite
+
+        # Formatação
+        if deadline:
+            delta = deadline - now
+            total = int(delta.total_seconds())
+            if total <= 0:
+                meta.tempo_limite_formatado = "0 h 0 m 0 s"
+            else:
+                h = total // 3600
+                m = (total % 3600) // 60
+                s = total % 60
+                meta.tempo_limite_formatado = f"{h} h {m} m {s} s"
+        else:
+            meta.tempo_limite_formatado = "Sem limite"
+
+        # Já cumpriu?
+        meta.foi_cumprida_pelo_usuario = (
+            request.user.is_authenticated and
+            meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
+        )
 
     context = {
-        'comunidade': comunidade,
-        'metas': metas,
-        'colocacao': colocacao if colocacao else "Sem colocação",
-        'ranking': ranking,
-        'sem_metas': sem_metas,
-        'is_admin': request.user == comunidade.admin,
-        'cor_bg': cor_bg,
-        'cor_fg': cor_fg,
+        "comunidade": comunidade,
+        "metas": metas,
+        "colocacao": colocacao,
+        "ranking_list": Ranking.objects.select_related("usuario").order_by("-pontuacao_total"),
+        "sem_metas": not metas.exists(),
+        "is_admin": request.user.is_authenticated and request.user == comunidade.admin,
     }
-    return render(request, 'metas.html', context)
+    return render(request, "metas.html", context)
+
+
+
+
+
+def visualizar_ranking_global(request):
+    ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:50]
+    return render(request, "ranking.html", {"ranking_list": ranking_list, "user": request.user})
 
 
 @login_required
@@ -858,8 +918,6 @@ def sair_comunidade(request, comunidade_id):
         return redirect("comunidades")
 
     return redirect("comunidades")
-
-import datetime
 
 def parse_tempo_limite(texto):
     """
