@@ -1,414 +1,112 @@
-/* ====== CONTAINER GERAL ====== */
+/* ======================
+   LAYOUT DAS METAS
+   ====================== */
+
+/* Container principal */
 .metas-container {
-    width: 92%;
-    max-width: 1250px;
+    width: 85%;
+    max-width: 1300px;
     margin: 40px auto;
     display: grid;
-    grid-template-columns: 1fr 300px; 
-    gap: 50px;
-    align-items: flex-start;
+    grid-template-columns: 2.2fr 1fr; /* metas médias + ranking menor */
+    gap: 70px; /* distância forte entre metas e ranking */
 }
 
-/* ====== LISTA DE METAS ====== */
+/* Lista das metas */
 .metas-lista {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 22px;
 }
 
-/* ====== CARD DE META ====== */
+
+/* ======================
+   META CARD
+   ====================== */
+
 .meta-card {
-    width: 95%;
-    padding: 22px;
-    border-radius: 18px;
-    background-color: var(--comunidade-bg);
-    color: var(--comunidade-fg);
-    box-shadow: 0 5px 18px rgba(0,0,0,0.15);
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+    align-items: center;
+    justify-content: space-between;
 
-.meta-card h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: bold;
-}
+    background-color: var(--comunidade-bg) !important;
+    color: var(--comunidade-fg) !important;
 
-.meta-card p {
-    margin: 0;
-    font-size: 15px;
-}
+    padding: 18px 22px;
+    border-radius: 14px;
 
-.meta-card.cumprida {
-    opacity: 0.45;
-    pointer-events: none;
-}
-
-/* ====== RANKING - LADO DIREITO ====== */
-.ranking-box {
-    background-color: var(--comunidade-bg);
-    filter: brightness(1.25); /* ✨ deixa a cor mais clara */
-    border-radius: 18px;
-    padding: 25px;
-    text-align: center;
-    box-shadow: 0 5px 18px rgba(0,0,0,0.12);
-    position: sticky;
-    top: 110px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.ranking-box p {
-    font-size: 17px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.ranking-emoji {
-    font-size: 36px;
-    display: block;
-    margin-bottom: -5px;
-}
-
-.btn-adicionar-meta,
-.btn-sair {
     width: 100%;
-    padding: 13px 0;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: 600;
+    max-width: 700px; /* *** MÉDIO, NÃO ESTICA A TELA TODA *** */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+/* Título da meta */
+.meta-titulo {
+    flex: 1;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    text-align: left;
+}
+
+
+/* ======================
+   CHECKBOX À DIREITA
+   ====================== */
+
+.checkbox-form {
+    margin: 0;
+    padding: 0;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-form input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    transform: scale(1.2);
     cursor: pointer;
-    transition: 0.2s;
-    font-size: 15px;
-}
-.btn-adicionar-meta {
-    background: #2fbf4a;
+    accent-color: var(--comunidade-fg);
 }
 
-.btn-adicionar-meta:hover {
-    background: #28a640;
-}
-.btn-sair {
-    background: #ff5a5a;
+/* Meta cumprida */
+.meta-card.cumprida {
+    opacity: 0.55;
 }
 
-.btn-sair:hover {
-    background: #e14949;
+
+/* ======================
+   RANKING
+   ====================== */
+
+.ranking-box {
+    background-color: var(--comunidade-bg) !important;
+    color: var(--comunidade-fg) !important;
+
+    border-radius: 16px;
+    padding: 26px;
+
+    box-shadow: 0 8px 26px rgba(0,0,0,0.08);
+
+    height: fit-content;
+    position: sticky;
+    top: 120px;
 }
 
-/* ====== TEMA DE COR ====== */
-:root {
-    /* JS vai setar isso, mas por enquanto c.cor entra aqui */
-    --comunidade-bg: {{ c.cor }};
-    --comunidade-fg: #000;
-}
 
-/* ====== RESPONSIVO ====== */
+/* ======================
+   RESPONSIVO
+   ====================== */
+
 @media (max-width: 900px) {
     .metas-container {
         grid-template-columns: 1fr;
+        gap: 25px;
+        width: 92%;
     }
-    .ranking-box {
-        position: relative;
-        top: 0;
-        width: 100%;
+
+    .meta-card {
+        max-width: 100%;
     }
 }
-
-
-
-/* COPILOT */
-
-.metas-container {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 40px;
-    width: 90%;
-    margin: 40px auto;
-}
-
-.metas-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding-left: 20px;
-}
-
-.ranking-box {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.ranking-card {
-    background-color: var(--ranking-bg);
-    color: var(--comunidade-fg);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-    text-align: center;
-}
-
-.meta-card {
-    background-color: var(--comunidade-bg);
-    color: var(--comunidade-fg);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.meta-card.cumprida {
-    opacity: 0.5;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.btn-adicionar-meta,
-.btn-sair {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-}
-
-.btn-adicionar-meta {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.btn-adicionar-meta:hover {
-    background-color: #45a049;
-}
-
-.btn-sair {
-    background-color: #ff4d4d;
-    color: white;
-}
-
-.btn-sair:hover {
-    background-color: #e03c3c;
-}
-
-@media (max-width: 768px) {
-  .menu {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-    padding: 20px;
-  }
-
-  .menu .icons {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 12px;
-  }
-
-  .topo-comunidade {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-
-  .grade-comunidades {
-    grid-template-columns: repeat(1, 1fr);
-    gap: 30px;
-    justify-items: center;
-  }
-
-  .card-comunidade {
-    width: 90%;
-    max-width: 320px;
-  }
-
-  .nome-comunidade {
-    font-size: 1.4rem;
-    text-align: center;
-  }
-
-  #pesquisa {
-    width: 100% !important;
-  }
-
-  #btnAdd {
-    align-self: flex-end;
-  }
-}
-
-.ranking-card {
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #f7fff7;
-}
-
-.ranking-actions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.ranking-actions .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  color: #fff;
-  background: #23a36e; /* verde padrão */
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.ranking-actions .btn:hover {
-  background: #1b865a;
-}
-
-/* Se quiser variantes, mantenha o mesmo tamanho */
-.btn--secondary { background: #2f80ed; }
-.btn--danger    { background: #d64a4a; }
-
-/* Layout geral */
-.page-content {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr; /* metas à esquerda, ranking à direita */
-  gap: 20px;
-  align-items: start;
-}
-
-/* Lista de metas */
-.metas-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-.meta-card {
-  background: #ffe4ef; /* seu rosa */
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
-
-/* Ranking box à direita */
-.ranking-card {
-  background: #e6fff0; /* seu verde claro */
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
-
-/* Ações: mesmo tamanho para todos os botões */
-.ranking-actions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.ranking-actions .btn,
-.btn-meta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  color: #fff;
-  background: #23a36e;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.ranking-actions .btn:hover,
-.btn-meta:hover {
-  background: #1b865a;
-}
-
-.btn--secondary { background: #2f80ed; }
-.btn--danger    { background: #d64a4a; }
-
-/* Medidor simples de colocação quando não for 1–3 */
-.circle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #23a36e;
-  color: #fff;
-  font-weight: 700;
-}
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 24px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
-.modal-content label {
-  display: block;
-  margin-top: 12px;
-  font-weight: 600;
-}
-
-.modal-content input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.metas-container {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 24px;
-  padding: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-

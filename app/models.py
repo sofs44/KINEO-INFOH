@@ -233,13 +233,8 @@ class Comunidade(models.Model):
 class MetaComunidade(models.Model):
     comunidade = models.ForeignKey(Comunidade, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=100)
-    tempo_limite = models.DurationField()
-    criado_em = models.DateTimeField(auto_now_add=True)
     usuarios_cumpriram = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
-
-    def tempo_restante(self):
-        limite = self.criado_em + self.tempo_limite
-        return limite - timezone.now()
 
     def __str__(self):
         return self.titulo
+

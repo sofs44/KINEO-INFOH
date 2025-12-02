@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/metas.css' %}">
 </head>
 
-<body>
+<body class="page-metas">
     <header>
         <div class="menu">
             <img src="{% static 'Assets/logo.png' %}" alt="Logo" class="logo">
@@ -102,7 +102,8 @@
     </header>
 
     <!-- Conteúdo principal -->
-    <div class="tema-comunidade" data-bg="{{ cor_bg }}" data-fg="{{ cor_fg }}">
+    <div class="tema-comunidade" style="--comunidade-bg: {{ cor_bg }}; --comunidade-fg: {{ cor_fg }};">
+
         <main class="metas-container">
 
             <!-- Lista de metas -->
@@ -113,29 +114,19 @@
                 </div>
                 {% else %}
                 {% for meta in metas %}
-                <div class="meta-card {% if meta.foi_cumprida_pelo_usuario %}cumprida{% endif %}">
-                    <h3 class="meta-titulo">{{ meta.titulo }}</h3>
-                    <p class="meta-tempo">
-                        Tempo restante:
-                        <span class="tempo-restante">{{ meta.tempo_limite_formatado }}</span>
-                    </p>
+                <div class="meta-card" style="--comunidade-bg: {{ c.cor }}; --comunidade-fg: #fff;">
+                    <span class="meta-titulo">{{ meta.titulo }}</span>
 
-                    <form method="POST" action="{% url 'cumprir_meta' meta.id %}" class="form-cumprir">
+                    <form method="POST" action="/meta/{{ meta.id }}/cumprir/" class="checkbox-form">
                         {% csrf_token %}
-                        {% if meta.foi_cumprida_pelo_usuario %}
-                        <label>
-                            <input type="checkbox" checked disabled>
-                            Marcar como cumprida
-                        </label>
-                        {% else %}
-                        <label>
-                            <input type="checkbox" name="cumprir" onchange="this.form.submit()">
-                            Marcar como cumprida
-                        </label>
-                        {% endif %}
+                        <input type="checkbox" onchange="this.form.submit()">
                     </form>
                 </div>
+
                 {% endfor %}
+
+
+
                 {% endif %}
             </section>
 
@@ -215,13 +206,11 @@
     <div id="modal-adicionar-meta" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <h2>Nova meta</h2>
-            <form method="POST" action="{% url 'criar_meta_ajax' comunidade.id %}">
+            <form id="form-meta" method="POST" action="{% url 'criar_meta_ajax' comunidade.id %}">
                 {% csrf_token %}
                 <label for="titulo">Título da meta:</label>
                 <input type="text" name="titulo" id="titulo" required>
 
-                <label for="tempo_limite">Tempo limite (em horas):</label>
-                <input type="number" name="tempo_limite" id="tempo_limite" min="1" required>
 
                 <div class="modal-actions">
                     <button type="submit" class="btn">Criar meta</button>
@@ -235,14 +224,31 @@
 
 
     <script>
+        // Abrir modal
         document.getElementById("btn-abrir-modal")?.addEventListener("click", () => {
-            document.getElementById("modal-meta").style.display = "block";
+            document.getElementById("modal-adicionar-meta").style.display = "flex";
         });
+        (function () {
+            // substitua por {{ cor_bg|default:"#ffffff" }} se necessário
+            const bg = "{{ cor_bg|default:'#ffffff' }}";
+            const fg = "{{ cor_fg|default:'#000000' }}";
+            try {
+                document.documentElement.style.setProperty('--comunidade-bg', bg);
+                document.documentElement.style.setProperty('--comunidade-fg', fg);
+                // também define --ranking-bg só se quiser
+                // document.documentElement.style.setProperty('--ranking-bg', bg);
+                console.log("vars set:", bg, fg);
+            } catch (e) {
+                console.error("Erro ao setar cores:", e);
+            }
+        })();
 
-        document.querySelector(".close")?.addEventListener("click", () => {
-            document.getElementById("modal-meta").style.display = "none";
-        });
+        // Fechar modal
+        function fecharModal() {
+            document.getElementById("modal-adicionar-meta").style.display = "none";
+        }
 
+        // Criar meta via AJAX
         document.getElementById("form-meta")?.addEventListener("submit", function (e) {
             e.preventDefault();
             const formData = new FormData(this);
@@ -254,7 +260,7 @@
                 },
                 body: formData
             })
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
                     if (data.status === "ok") {
                         location.reload();
@@ -263,75 +269,42 @@
                     }
                 });
         });
-        function iniciarContadores() {
-            const contadores = document.querySelectorAll(".contador");
-            contadores.forEach(el => {
-                const timestamp = parseFloat(el.getAttribute("data-fim"));
-                const fim = new Date(timestamp * 1000);
-                atualizarContador(el, fim);
-                setInterval(() => atualizarContador(el, fim), 1000);
-            });
-        }
 
-
-        function parseTempo(texto) {
-            const partes = texto.trim().split(" ");
-            let dias = 0, horas = 0, minutos = 0, segundos = 0;
-            if (partes.length === 2) {
-                dias = parseInt(partes[0]);
-                [horas, minutos, segundos] = partes[1].split(":").map(Number);
-            } else {
-                [horas, minutos, segundos] = partes[0].split(":").map(Number);
-            }
-            return ((dias * 86400 + horas * 3600 + minutos * 60 + segundos) * 1000);
-        }
-
-        function atualizarContador(el, fim) {
-            const agora = new Date();
-            const diff = fim - agora;
-            if (diff <= 0) {
-                el.textContent = "Tempo esgotado";
-                return;
-            }
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            el.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
-        document.addEventListener("DOMContentLoaded", iniciarContadores);
-
-        // Remover metas cumpridas após 24h
-        document.querySelectorAll(".meta-card.cumprida").forEach(card => {
-            setTimeout(() => card.remove(), 86400000); // 24h em ms
-        });
-
+        // Aplicar tema da comunidade
+        // Aplicar tema da comunidade — versão segura que respeita o style inline
         document.addEventListener("DOMContentLoaded", () => {
             const tema = document.querySelector(".tema-comunidade");
             if (!tema) return;
 
-            const bg = tema.getAttribute("data-bg") || "#ffffff";
-            const fg = tema.getAttribute("data-fg") || "#000000";
+            // tenta pegar a variável já definida no style inline (se existir)
+            let bg = tema.style.getPropertyValue('--comunidade-bg')?.trim();
+            let fg = tema.style.getPropertyValue('--comunidade-fg')?.trim();
+
+            // se não tiver no inline, tenta data-attrs (compatibilidade)
+            if (!bg) bg = tema.getAttribute('data-bg') || "";
+            if (!fg) fg = tema.getAttribute('data-fg') || "";
+
+            // se ainda não tiver, usa fallback
+            if (!bg) bg = "#ffffff";
+            if (!fg) fg = "#000000";
 
             document.documentElement.style.setProperty("--comunidade-bg", bg);
             document.documentElement.style.setProperty("--comunidade-fg", fg);
         });
 
+
+        // Aplicar cor mais clara no ranking
         document.addEventListener("DOMContentLoaded", () => {
             const tema = document.querySelector(".tema-comunidade");
             if (!tema) return;
 
             const bg = tema.getAttribute("data-bg") || "#ffffff";
-            const fg = tema.getAttribute("data-fg") || "#000000";
 
-            document.documentElement.style.setProperty("--comunidade-bg", bg);
-            document.documentElement.style.setProperty("--comunidade-fg", fg);
-
-            // ranking mais claro
             const rankingBg = lightenColor(bg, 0.6);
             document.documentElement.style.setProperty("--ranking-bg", rankingBg);
         });
 
+        // função para clarear cor
         function lightenColor(hex, percent) {
             hex = hex.replace("#", "");
             const num = parseInt(hex, 16);
@@ -342,53 +315,5 @@
             g = g > 255 ? 255 : g;
             b = b > 255 ? 255 : b;
             return `rgb(${r}, ${g}, ${b})`;
-        }
-        document.addEventListener("DOMContentLoaded", function () {
-            const cards = document.querySelectorAll(".meta-card");
-
-            cards.forEach(card => {
-                const span = card.querySelector(".tempo-restante");
-                const deadlineTs = card.dataset.deadline;
-                let remaining = card.dataset.initialRemaining;
-
-                // Se não há prazo, não atualiza
-                if (!deadlineTs && !remaining) return;
-
-                remaining = parseInt(remaining, 10);
-                if (isNaN(remaining)) {
-                    const now = Math.floor(Date.now() / 1000);
-                    const deadline = parseInt(deadlineTs, 10);
-                    remaining = Math.max(deadline - now, 0);
-                }
-
-                function render(sec) {
-                    const h = Math.floor(sec / 3600);
-                    const m = Math.floor((sec % 3600) / 60);
-                    const s = Math.floor(sec % 60);
-                    span.textContent = `${h} h ${m} m ${s} s`;
-                }
-
-                render(remaining);
-
-                const interval = setInterval(() => {
-                    remaining = remaining - 1;
-                    if (remaining <= 0) {
-                        render(0);
-                        clearInterval(interval);
-                        return;
-                    }
-                    render(remaining);
-                }, 1000);
-            });
-        });
-        const modal = document.getElementById("modal-adicionar-meta");
-        const abrirBtn = document.getElementById("btn-abrir-modal");
-
-        abrirBtn.addEventListener("click", () => {
-            modal.style.display = "flex";
-        });
-
-        function fecharModal() {
-            modal.style.display = "none";
         }
     </script>

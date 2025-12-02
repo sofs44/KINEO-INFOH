@@ -22,6 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
 from django.db import ProgrammingError
+from datetime import datetime
 
 
 
@@ -771,47 +772,11 @@ def metas_view(request, comunidade_id):
                 colocacao = i
                 break
 
-    # Tempo restante (aceita deadline DateTimeField ou DurationField somado ao criado_em)
-    now = timezone.now()
+    # Marca se o usuário já cumpriu cada meta
     for meta in metas:
-        deadline = None
-        # Dentro do loop de metas:
-        deadline = meta.criado_em + meta.tempo_limite
-        delta = deadline - timezone.now()
-        total = int(delta.total_seconds())
-        meta.tempo_limite_formatado = f"{total // 3600} h {(total % 3600) // 60} m {total 
-
-        # prazo_final: DateTimeField (se existir)
-        if hasattr(meta, "prazo_final") and getattr(meta, "prazo_final"):
-            deadline = meta.prazo_final
-            if timezone.is_naive(deadline):
-                deadline = timezone.make_aware(deadline, timezone.get_current_timezone())
-
-        # tempo_limite: DurationField (se existir)
-        elif hasattr(meta, "tempo_limite") and getattr(meta, "tempo_limite"):
-            criado = meta.criado_em
-            if timezone.is_naive(criado):
-                criado = timezone.make_aware(criado, timezone.get_current_timezone())
-            deadline = criado + meta.tempo_limite
-
-        # Formatação
-        if deadline:
-            delta = deadline - now
-            total = int(delta.total_seconds())
-            if total <= 0:
-                meta.tempo_limite_formatado = "0 h 0 m 0 s"
-            else:
-                h = total // 3600
-                m = (total % 3600) // 60
-                s = total % 60
-                meta.tempo_limite_formatado = f"{h} h {m} m {s} s"
-        else:
-            meta.tempo_limite_formatado = "Sem limite"
-
-        # Já cumpriu?
         meta.foi_cumprida_pelo_usuario = (
-            request.user.is_authenticated and
-            meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
+            request.user.is_authenticated
+            and meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
         )
 
     context = {
@@ -823,8 +788,6 @@ def metas_view(request, comunidade_id):
         "is_admin": request.user.is_authenticated and request.user == comunidade.admin,
     }
     return render(request, "metas.html", context)
-
-
 
 
 
@@ -856,12 +819,11 @@ def cumprir_meta(request, meta_id):
 
 
 class MetaForm(forms.ModelForm):
-    class Meta:
-        model = MetaComunidade
-        fields = ['titulo', 'tempo_limite']
-        widgets = {
-            'tempo_limite': forms.TextInput(attrs={'placeholder': 'Ex: 3 days, 2:00:00'}),
-        }
+    class MetaForm(forms.ModelForm):
+        class Meta:
+            model = MetaComunidade
+            fields = ["titulo"]
+
 
 @login_required
 def adicionar_meta(request, comunidade_id):
@@ -882,32 +844,24 @@ def adicionar_meta(request, comunidade_id):
 
     return render(request, 'adicionar_meta.html', {'form': form, 'comunidade': comunidade})
 
+from datetime import timedelta
+import re
 @csrf_exempt
 @login_required
 def criar_meta_ajax(request, comunidade_id):
-    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
-
-    if request.user != comunidade.admin:
-        return JsonResponse({"status": "erro", "msg": "Sem permissão"})
-
     if request.method == "POST":
         titulo = request.POST.get("titulo")
-        tempo_raw = request.POST.get("tempo_limite")
 
-        try:
-            tempo_limite = eval(f"datetime.timedelta({tempo_raw})")
-        except:
-            return JsonResponse({"status": "erro", "msg": "Formato de tempo inválido"})
+        comunidade = get_object_or_404(Comunidade, id=comunidade_id)
 
         MetaComunidade.objects.create(
             comunidade=comunidade,
             titulo=titulo,
-            tempo_limite=tempo_limite
         )
 
         return JsonResponse({"status": "ok"})
 
-    return JsonResponse({"status": "erro", "msg": "Método inválido"})
+    return JsonResponse({"status": "erro"}, status=400)
 
 @login_required
 def sair_comunidade(request, comunidade_id):
@@ -918,55 +872,3 @@ def sair_comunidade(request, comunidade_id):
         return redirect("comunidades")
 
     return redirect("comunidades")
-
-def parse_tempo_limite(texto):
-    """
-    Converte 'HH:MM:SS' ou 'DD HH:MM:SS' em timedelta.
-    Exemplos:
-      - '02:30:00' -> 2h30m
-      - '3 01:00:00' -> 3 dias e 1 hora
-    """
-    try:
-        partes = texto.strip().split()
-        if len(partes) == 1:
-            # HH:MM:SS
-            h, m, s = map(int, partes[0].split(":"))
-            return datetime.timedelta(hours=h, minutes=m, seconds=s)
-        elif len(partes) == 2:
-            # DD HH:MM:SS
-            d = int(partes[0])
-            h, m, s = map(int, partes[1].split(":"))
-            return datetime.timedelta(days=d, hours=h, minutes=m, seconds=s)
-        else:
-            return None
-    except Exception:
-        return None
-
-@login_required
-def criar_meta_ajax(request, comunidade_id):
-    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
-
-    if request.user != comunidade.admin:
-        return JsonResponse({"status": "erro", "msg": "Sem permissão"}, status=403)
-
-    if request.method == "POST":
-        titulo = request.POST.get("titulo", "").strip()
-        tempo_raw = request.POST.get("tempo_limite", "").strip()
-
-        if not titulo:
-            return JsonResponse({"status": "erro", "msg": "Título é obrigatório"}, status=400)
-
-        td = parse_tempo_limite(tempo_raw)
-        if td is None:
-            return JsonResponse({"status": "erro", "msg": "Formato de tempo inválido. Use HH:MM:SS ou DD HH:MM:SS"}, status=400)
-
-        MetaComunidade.objects.create(
-            comunidade=comunidade,
-            titulo=titulo,
-            tempo_limite=td
-        )
-
-        return JsonResponse({"status": "ok"})
-
-    return JsonResponse({"status": "erro", "msg": "Método inválido"}, status=405)
-
