@@ -114,12 +114,12 @@
                 </div>
                 {% else %}
                 {% for meta in metas %}
-                <div class="meta-card" style="--comunidade-bg: {{ c.cor }}; --comunidade-fg: #fff;">
+                <div class="meta-card" style="--comunidade-bg: {{ cor_bg }}; --comunidade-fg: {{ cor_fg }};">
                     <span class="meta-titulo">{{ meta.titulo }}</span>
 
                     <form method="POST" action="/meta/{{ meta.id }}/cumprir/" class="checkbox-form">
                         {% csrf_token %}
-                        <input type="checkbox" onchange="this.form.submit()">
+                        <input type="checkbox" class="check-meta" data-id="{{ meta.id }}">
                     </form>
                 </div>
 
@@ -228,20 +228,6 @@
         document.getElementById("btn-abrir-modal")?.addEventListener("click", () => {
             document.getElementById("modal-adicionar-meta").style.display = "flex";
         });
-        (function () {
-            // substitua por {{ cor_bg|default:"#ffffff" }} se necessário
-            const bg = "{{ cor_bg|default:'#ffffff' }}";
-            const fg = "{{ cor_fg|default:'#000000' }}";
-            try {
-                document.documentElement.style.setProperty('--comunidade-bg', bg);
-                document.documentElement.style.setProperty('--comunidade-fg', fg);
-                // também define --ranking-bg só se quiser
-                // document.documentElement.style.setProperty('--ranking-bg', bg);
-                console.log("vars set:", bg, fg);
-            } catch (e) {
-                console.error("Erro ao setar cores:", e);
-            }
-        })();
 
         // Fechar modal
         function fecharModal() {
@@ -272,38 +258,6 @@
 
         // Aplicar tema da comunidade
         // Aplicar tema da comunidade — versão segura que respeita o style inline
-        document.addEventListener("DOMContentLoaded", () => {
-            const tema = document.querySelector(".tema-comunidade");
-            if (!tema) return;
-
-            // tenta pegar a variável já definida no style inline (se existir)
-            let bg = tema.style.getPropertyValue('--comunidade-bg')?.trim();
-            let fg = tema.style.getPropertyValue('--comunidade-fg')?.trim();
-
-            // se não tiver no inline, tenta data-attrs (compatibilidade)
-            if (!bg) bg = tema.getAttribute('data-bg') || "";
-            if (!fg) fg = tema.getAttribute('data-fg') || "";
-
-            // se ainda não tiver, usa fallback
-            if (!bg) bg = "#ffffff";
-            if (!fg) fg = "#000000";
-
-            document.documentElement.style.setProperty("--comunidade-bg", bg);
-            document.documentElement.style.setProperty("--comunidade-fg", fg);
-        });
-
-
-        // Aplicar cor mais clara no ranking
-        document.addEventListener("DOMContentLoaded", () => {
-            const tema = document.querySelector(".tema-comunidade");
-            if (!tema) return;
-
-            const bg = tema.getAttribute("data-bg") || "#ffffff";
-
-            const rankingBg = lightenColor(bg, 0.6);
-            document.documentElement.style.setProperty("--ranking-bg", rankingBg);
-        });
-
         // função para clarear cor
         function lightenColor(hex, percent) {
             hex = hex.replace("#", "");
@@ -316,4 +270,24 @@
             b = b > 255 ? 255 : b;
             return `rgb(${r}, ${g}, ${b})`;
         }
+        document.addEventListener("DOMContentLoaded", () => {
+            const bg = "{{ cor_bg }}";
+            const fg = "{{ cor_fg }}";
+
+            document.documentElement.style.setProperty("--comunidade-bg", bg);
+            document.documentElement.style.setProperty("--comunidade-fg", fg);
+        });
+        document.querySelectorAll(".check-meta").forEach(chk => {
+            chk.addEventListener("change", function () {
+                fetch(`/meta/${this.dataset.id}/cumprir/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    }
+                }).then(() => {
+                    // deixar a meta mais transparente para mostrar que foi cumprida
+                    this.closest(".meta-card").style.opacity = 0.55;
+                });
+            });
+        });
     </script>
