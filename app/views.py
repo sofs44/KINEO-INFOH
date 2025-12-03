@@ -283,19 +283,6 @@ def buscar_parceiros(request):
         "buscar_parceiros.html",
         {"form": form, "parceiros": parceiros, "sem_resultados": sem_resultados}
     )
-def visualizar_ranking(request, comunidade_id):
-    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
-
-    ranking_list = Ranking.objects.filter(
-        usuario__comunidades__id=comunidade.id  # ou outro campo que relacione usuário à comunidade
-    ).select_related("usuario").order_by("-pontuacao_total")[:50]
-
-    return render(request, "ranking.html", {
-        "ranking_list": ranking_list,
-        "comunidade": comunidade,
-        "user": request.user
-    })
-
 
 def chat_view(request):
 
@@ -753,29 +740,15 @@ def metas_view(request, comunidade_id):
     comunidade = get_object_or_404(Comunidade, id=comunidade_id)
     metas = MetaComunidade.objects.filter(comunidade=comunidade)
 
-    # Pontos por metas cumpridas
-    pontos = {}
-    for meta in metas:
-        for usuario in meta.usuarios_cumpriram.all():
-            pontos[usuario] = pontos.get(usuario, 0) + 1
+    ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")
 
-    # Atualiza ranking
-# Atualiza ranking (cada meta vale 10 pontos)
-    PONTOS_POR_META = 10
-    for usuario, score in pontos.items():
-        ranking_obj, _ = Ranking.objects.get_or_create(usuario=usuario)
-        ranking_obj.pontuacao_total = score * PONTOS_POR_META
-        ranking_obj.save()
-
-
-    # Colocação do usuário
     colocacao = None
     if request.user.is_authenticated:
-        ranking_ordenado = sorted(pontos.items(), key=lambda x: x[1], reverse=True)
-        for i, (usuario, score) in enumerate(ranking_ordenado, start=1):
-            if usuario == request.user:
-                colocacao = i
+        for pos, reg in enumerate(ranking_list, start=1):
+            if reg.usuario == request.user:
+                colocacao = pos
                 break
+
 
     # Marca se o usuário já cumpriu cada meta
     for meta in metas:
@@ -792,14 +765,14 @@ def metas_view(request, comunidade_id):
         "comunidade": comunidade,
         "metas": metas,
         "colocacao": colocacao,
-        "ranking_list": Ranking.objects.select_related("usuario").order_by("-pontuacao_total"),
+        "ranking_list": ranking_list,
         "sem_metas": not metas.exists(),
-        "is_admin": request.user.is_authenticated and request.user == comunidade.admin,
-
-    # 🔥 VARIÁVEIS QUE FAZEM A COR FINALMENTE FUNCIONAR
+        "is_admin": ...,
         "cor_bg": cor_bg,
         "cor_fg": cor_fg,
-    }
+}
+
+
 
     return render(request, "metas.html", context)
 
@@ -811,29 +784,13 @@ from django.shortcuts import get_object_or_404, render
 
 User = get_user_model()
 
-def visualizar_ranking(request, comunidade_id):
-    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+from django.db.models import Count
 
-    # Conta quantas metas de *esta* comunidade cada usuário cumpriu
-    users = User.objects.filter(
-        metacomunidade__comunidade=comunidade  # relaciona MetaComunidade -> usuarios_cumpriram
-    ).annotate(
-        metas_cumpridas=Count('metacomunidade', filter=Q(metacomunidade__comunidade=comunidade))
-    ).order_by('-metas_cumpridas', 'username')  # ordena do maior ao menor
+def visualizar_ranking(request):
+    ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")
 
-    # converte para objeto com pontos (10 por meta)
-    PONTOS_POR_META = 10
-    ranking_list = []
-    for u in users:
-        ranking_list.append({
-            'usuario': u,
-            'metas_cumpridas': u.metas_cumpridas,
-            'pontos': u.metas_cumpridas * PONTOS_POR_META,
-        })
-
-    return render(request, 'ranking.html', {
-        'ranking_list': ranking_list,
-        'comunidade': comunidade,
+    return render(request, "ranking/ranking.html", {
+        "ranking_list": ranking_list
     })
 
 
@@ -865,6 +822,9 @@ def cumprir_meta(request, meta_id):
         meta.usuarios_cumpriram.add(request.user)
         estado = True
 
+    calcular_ranking_global()
+
+
     return JsonResponse({"success": True, "checked": estado})
 
 
@@ -895,7 +855,6 @@ def adicionar_meta(request, comunidade_id):
 
     return render(request, 'adicionar_meta.html', {'form': form, 'comunidade': comunidade})
 
-from datetime import timedelta
 import re
 @csrf_exempt
 @login_required
@@ -924,12 +883,63 @@ def sair_comunidade(request, comunidade_id):
 
     return redirect("comunidades")
 
-from django.shortcuts import render, get_object_or_404
-from .models import Comunidade, MetaComunidade, Usuario
+from django.db.models import Count
+from app.models import Usuario, MetaComunidade
 
 def ranking_global(request):
-    ranking = Usuario.objects.all().order_by('-pontos')
+    PONTOS_POR_META = 10
 
-    return render(request, 'ranking.html', {
-        'ranking': ranking
-    })
+    # Conta metas cumpridas por usuário
+    per_user = (
+        MetaComunidade.objects
+        .values('usuarios_cumpriram')
+        .annotate(metas_cumpridas=Count('id'))
+        .filter(usuarios_cumpriram__isnull=False)
+    )
+
+    # transforma em dicionário {id_usuario: quantidade}
+    counts = {d['usuarios_cumpriram']: d['metas_cumpridas'] for d in per_user}
+
+    # Se ninguém tem metas, retorna lista vazia
+    if not counts:
+        return render(request, "ranking.html", {"ranking_list": []})
+
+    # pega todos usuários envolvidos
+    user_objs = Usuario.objects.filter(id_usuario__in=list(counts.keys()))
+    users_by_id = {u.id_usuario: u for u in user_objs}
+
+    # monta o ranking no formato que o HTML espera
+    ranking_list = []
+    for uid, num_metas in counts.items():
+        u = users_by_id.get(uid)
+        if not u:
+            continue
+        ranking_list.append({
+            "usuario": u,
+            "pontuacao_total": num_metas * PONTOS_POR_META,
+            "metas_cumpridas": num_metas
+        })
+
+    # ordena por pontos
+    ranking_list.sort(key=lambda x: x["pontuacao_total"], reverse=True)
+
+    return render(request, "ranking.html", {"ranking_list": ranking_list})
+
+
+
+def calcular_ranking_global():
+    from django.db.models import Count
+
+    PONTOS_POR_META = 10
+
+    # lista todos os usuários e conta metas cumpridas em todas as comunidades
+    dados = (
+        Usuario.objects.annotate(
+            total_metas=Count("metacomunidade__usuarios_cumpriram", distinct=True)
+        )
+    )
+
+    for usuario in dados:
+        ranking, _ = Ranking.objects.get_or_create(usuario=usuario)
+        ranking.pontuacao_total = usuario.total_metas * PONTOS_POR_META
+        ranking.save()
