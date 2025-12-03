@@ -17,7 +17,7 @@ from .models import (
 )
 from django.db.models import Q
 from django.utils import timezone
-from .models import Comunidade, MetaComunidade
+from .models import Comunidade, MetaComunidade, Usuario
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
@@ -139,13 +139,15 @@ def logout_view(request):
 
 def home(request):
     context = {}
+    
     if request.user.is_authenticated:
-        # AQUI HÁ UM PONTO DE MELHORIA:
-        # Se um usuário puder ter VÁRIAS preferências, .all() está correto.
-        # Se ele só puder ter UMA, o ideal é usar .first()
-        context["preferencias"] = request.user.preferencias.all() 
+        context["preferencias"] = request.user.preferencias.all()
         context["grupos"] = request.user.grupos.all()
+
+        # PEGAR A COMUNIDADE DO USUÁRIO PARA O MEN
+
     return render(request, "home.html", context)
+
 
 
 # =================================================================
@@ -758,10 +760,13 @@ def metas_view(request, comunidade_id):
             pontos[usuario] = pontos.get(usuario, 0) + 1
 
     # Atualiza ranking
+# Atualiza ranking (cada meta vale 10 pontos)
+    PONTOS_POR_META = 10
     for usuario, score in pontos.items():
         ranking_obj, _ = Ranking.objects.get_or_create(usuario=usuario)
-        ranking_obj.pontuacao_total = score
+        ranking_obj.pontuacao_total = score * PONTOS_POR_META
         ranking_obj.save()
+
 
     # Colocação do usuário
     colocacao = None
@@ -778,6 +783,10 @@ def metas_view(request, comunidade_id):
             request.user.is_authenticated
             and meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
         )
+        # COR DA COMUNIDADE PARA ESTILIZAR A PÁGINA
+    cor_bg = comunidade.cor
+    cor_fg = "#ffffff" if cor_escura(comunidade.cor) else "#000000"
+
 
     context = {
         "comunidade": comunidade,
@@ -786,14 +795,47 @@ def metas_view(request, comunidade_id):
         "ranking_list": Ranking.objects.select_related("usuario").order_by("-pontuacao_total"),
         "sem_metas": not metas.exists(),
         "is_admin": request.user.is_authenticated and request.user == comunidade.admin,
+
+    # 🔥 VARIÁVEIS QUE FAZEM A COR FINALMENTE FUNCIONAR
+        "cor_bg": cor_bg,
+        "cor_fg": cor_fg,
     }
+
     return render(request, "metas.html", context)
 
 
 
-def visualizar_ranking_global(request):
-    ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")[:50]
-    return render(request, "ranking.html", {"ranking_list": ranking_list, "user": request.user})
+from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, render
+
+User = get_user_model()
+
+def visualizar_ranking(request, comunidade_id):
+    comunidade = get_object_or_404(Comunidade, id=comunidade_id)
+
+    # Conta quantas metas de *esta* comunidade cada usuário cumpriu
+    users = User.objects.filter(
+        metacomunidade__comunidade=comunidade  # relaciona MetaComunidade -> usuarios_cumpriram
+    ).annotate(
+        metas_cumpridas=Count('metacomunidade', filter=Q(metacomunidade__comunidade=comunidade))
+    ).order_by('-metas_cumpridas', 'username')  # ordena do maior ao menor
+
+    # converte para objeto com pontos (10 por meta)
+    PONTOS_POR_META = 10
+    ranking_list = []
+    for u in users:
+        ranking_list.append({
+            'usuario': u,
+            'metas_cumpridas': u.metas_cumpridas,
+            'pontos': u.metas_cumpridas * PONTOS_POR_META,
+        })
+
+    return render(request, 'ranking.html', {
+        'ranking_list': ranking_list,
+        'comunidade': comunidade,
+    })
+
 
 
 @login_required
@@ -807,15 +849,24 @@ def sair_comunidade(request, comunidade_id):
     # Se alguém acessar via GET, só redireciona
     return redirect("comunidades")
 
+from django.http import JsonResponse
+
 @login_required
 def cumprir_meta(request, meta_id):
+    if request.method != "POST":
+        return JsonResponse({"erro": "Método inválido"}, status=400)
+
     meta = get_object_or_404(MetaComunidade, id=meta_id)
 
-    if request.method == "POST":
+    if request.user in meta.usuarios_cumpriram.all():
+        meta.usuarios_cumpriram.remove(request.user)
+        estado = False
+    else:
         meta.usuarios_cumpriram.add(request.user)
-        return redirect("metas", comunidade_id=meta.comunidade.id)
+        estado = True
 
-    return redirect("metas", comunidade_id=meta.comunidade.id)
+    return JsonResponse({"success": True, "checked": estado})
+
 
 
 class MetaForm(forms.ModelForm):
@@ -872,3 +923,13 @@ def sair_comunidade(request, comunidade_id):
         return redirect("comunidades")
 
     return redirect("comunidades")
+
+from django.shortcuts import render, get_object_or_404
+from .models import Comunidade, MetaComunidade, Usuario
+
+def ranking_global(request):
+    ranking = Usuario.objects.all().order_by('-pontos')
+
+    return render(request, 'ranking.html', {
+        'ranking': ranking
+    })

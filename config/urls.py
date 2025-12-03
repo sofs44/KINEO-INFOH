@@ -14,11 +14,10 @@ urlpatterns = [
     path("comunidade/<int:comunidade_id>/metas/", views.metas_view, name="metas"),
     path("entrar_comunidade/<int:comunidade_id>/", views.entrar_comunidade, name="entrar_comunidade"),
     path("sair_comunidade/<int:comunidade_id>/", views.sair_comunidade, name="sair_comunidade"),
-    path("meta/<int:meta_id>/cumprir/", views.cumprir_meta, name="cumprir_meta"),
     path("comunidade/<int:comunidade_id>/adicionar_meta/", views.adicionar_meta, name="adicionar_meta"),
     path("comunidade/<int:comunidade_id>/criar_meta_ajax/", views.criar_meta_ajax, name="criar_meta_ajax"),
-    path("comunidade/<int:comunidade_id>/ranking/", views.visualizar_ranking, name="ranking"),
-
+    path("ranking/", views.ranking_global, name="ranking_global"),
+    path("meta/<int:meta_id>/cumprir/", views.cumprir_meta, name="cumprir_meta"),
     # Rotas gerais
     path("", views.home, name="home"), 
     path("sobre/", views.sobre, name="sobre"),
@@ -34,8 +33,6 @@ urlpatterns = [
     path("preferencia/deletar/<int:pk>/", views.deletar_preferencia, name="deletar_preferencia"),
 
     # Ranking global (sem comunidade)
-    path("ranking/", views.visualizar_ranking_global, name="ranking_global"),
-
     # Mensagens e conversas
     path("mensagem/enviar/<int:destinatario_id>/", views.enviar_mensagem, name="enviar_mensagem"),
     path("conversa/<int:usuario_id>/", views.conversa, name="conversa"),

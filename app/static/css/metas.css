@@ -1,26 +1,31 @@
 /* ======================
-   LAYOUT DAS METAS
+   LAYOUT PRINCIPAL
    ====================== */
 
-/* Container principal */
 .metas-container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 40px auto;
+    width: 92%;
+    max-width: 1500px;
+    margin: 30px auto;
+
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 60px;
+    gap: 40px;
 }
 
 
 
-/* Lista das metas */
+/* ======================
+   LISTA DAS METAS (ESQUERDA)
+   ====================== */
+
 .metas-lista {
     display: flex;
     flex-direction: column;
     gap: 22px;
+    width: 55%;
 }
+
 
 
 /* ======================
@@ -35,25 +40,23 @@
     background-color: var(--comunidade-bg) !important;
     color: var(--comunidade-fg) !important;
 
-    padding: 18px 22px;
-    border-radius: 14px;
+    padding: 22px 26px;
+    border-radius: 16px;
 
     width: 100%;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    max-width: 520px; /* ✔ META “MÉDIA” */
+    min-height: 85px;
 
-    padding: 26px 24px;
-    min-height: 90px; /* ✔ mais alto */
-    max-width: 620px; /* ✔ mais “médio”, não estica demais */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
-/* Título da meta */
 .meta-titulo {
     flex: 1;
     font-size: 20px;
     font-weight: 700;
     margin: 0;
-    text-align: left;
 }
+
 
 
 /* ======================
@@ -63,45 +66,89 @@
 .checkbox-form {
     margin: 0;
     padding: 0;
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
 }
 
 .checkbox-form input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    transform: scale(1.2);
+    width: 22px;
+    height: 22px;
     cursor: pointer;
     accent-color: var(--comunidade-fg);
 }
 
-/* Meta cumprida */
+
+
+/* META CUMPRIDA */
 .meta-card.cumprida {
     opacity: 0.55;
 }
+/* Meta NORMAL (não cumprida) */
+.meta-card:not(.cumprida) {
+    opacity: 1;
+}
+
 
 
 /* ======================
-   RANKING
+   RANKING (DIREITA)
    ====================== */
 
 .ranking-box {
+    width: 350px;
     background-color: var(--comunidade-bg);
     color: var(--comunidade-fg);
-    width: 350px;
-    padding: 26px;
-    border-radius: 18px;
 
-    box-shadow: 0 8px 26px rgba(0,0,0,0.08);
+    padding: 30px 26px;
+    border-radius: 20px;
+
+    box-shadow: 0 10px 26px rgba(0,0,0,0.10);
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 14px;
 
     position: sticky;
     top: 120px;
+
+    text-align: center;
+}
+
+/* Ícone da medalha */
+.ranking-box img,
+.ranking-box svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
+}
+
+
+
+/* ======================
+   BOTÕES BONITOS
+   ====================== */
+
+.ranking-box a,
+.ranking-box button {
+    width: 100%;
+    padding: 10px 0;
+    margin: 6px 0;
+
+    border: none;
+    outline: none;
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.2);
+    color: var(--comunidade-fg);
+    font-weight: 600;
+    font-size: 15px;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.ranking-box a:hover,
+.ranking-box button:hover {
+    background: rgba(255,255,255,0.35);
 }
 
 
@@ -110,14 +157,151 @@
    RESPONSIVO
    ====================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
     .metas-container {
-        grid-template-columns: 1fr;
-        gap: 25px;
-        width: 92%;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
     }
 
-    .meta-card {
-        max-width: 100%;
+    .metas-lista {
+        width: 100%;
+        max-width: 600px;
     }
+
+    .ranking-box {
+        width: 100%;
+        max-width: 500px;
+        position: static;
+    }
+}
+
+.check-container {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+}
+
+.check-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 28px;
+    width: 28px;
+    border-radius: 6px;
+    background-color: #fff;
+    border: 2px solid var(--comunidade-fg);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.check-container input:checked + .checkmark {
+    background-color: var(--comunidade-fg);
+    border-color: var(--comunidade-fg);
+}
+
+.checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.check-container input:checked + .checkmark::after {
+    display: block;
+    left: 9px;
+    top: 4px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+/* Quando o checkbox estiver desmarcado */
+.check-container input:not(:checked) + .checkmark {
+    background-color: #fff;
+    border-color: var(--comunidade-fg);
+    opacity: 1; /* garante que volta ao normal */
+}
+
+/* meta normal x cumprida */
+.meta-card {
+  transition: opacity 0.18s ease, transform 0.12s ease;
+  opacity: 1;
+}
+
+/* quando marcada */
+.meta-card.cumprida {
+  opacity: 0.55;
+}
+
+/* estado temporário enquanto se comunica com servidor */
+.meta-card.updating {
+  opacity: 0.8;
+  pointer-events: none;
+  filter: saturate(0.98);
+}
+
+/* check custom */
+.check-container {
+  position: relative;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+}
+.check-container input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.checkmark {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #fff;
+  border: 2px solid var(--comunidade-fg);
+  transition: all .16s ease;
+}
+.check-container input:not(:checked) + .checkmark {
+  background: #fff;
+  border-color: var(--comunidade-fg);
+}
+.check-container input:checked + .checkmark {
+  background: var(--comunidade-fg);
+  border-color: var(--comunidade-fg);
+}
+.checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.check-container input:checked + .checkmark::after {
+  display: block;
+  left: 9px;
+  top: 4px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+/* espacamento dos botões de ranking (se quiser ainda mais) */
+.ranking-box {
+  gap: 22px;
+}
+.ranking-box a,
+.ranking-box button {
+  margin: 10px 0;
 }

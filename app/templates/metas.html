@@ -114,14 +114,21 @@
                 </div>
                 {% else %}
                 {% for meta in metas %}
-                <div class="meta-card" style="--comunidade-bg: {{ cor_bg }}; --comunidade-fg: {{ cor_fg }};">
+                <div class="meta-card" style="--comunidade-bg: {{ cor_bg }}; --comunidade-fg: {{ cor_fg }};"
+                    data-id="{{ meta.id }}">
+
                     <span class="meta-titulo">{{ meta.titulo }}</span>
 
-                    <form method="POST" action="/meta/{{ meta.id }}/cumprir/" class="checkbox-form">
-                        {% csrf_token %}
-                        <input type="checkbox" class="check-meta" data-id="{{ meta.id }}">
-                    </form>
+                    <label class="check-container">
+                        <input type="checkbox" class="check-meta" data-id="{{ meta.id }}" 
+                        {% if request.user in meta.usuarios_cumpriram.all %}checked{% endif %}>
+
+                        <span class="checkmark"></span>
+                    </label>
+
                 </div>
+
+
 
                 {% endfor %}
 
@@ -184,9 +191,10 @@
                     <p>Sua colocação no ranking é: <strong>{{ colocacao|default:"Sem colocação" }}</strong></p>
 
                     <div class="ranking-actions">
-                        <form method="GET" action="{% url 'ranking' comunidade.id %}">
-                            <button class="btn">Ver ranking</button>
-                        </form>
+                        <a href="{% url 'ranking_global' %}" class="btn btn-primary">Ver Ranking</a>
+
+
+
 
                         {% if is_admin %}
                         <button id="btn-abrir-modal" class="btn btn--secondary">Adicionar meta</button>
@@ -224,70 +232,51 @@
 
 
     <script>
-        // Abrir modal
-        document.getElementById("btn-abrir-modal")?.addEventListener("click", () => {
-            document.getElementById("modal-adicionar-meta").style.display = "flex";
-        });
-
-        // Fechar modal
-        function fecharModal() {
-            document.getElementById("modal-adicionar-meta").style.display = "none";
+        /* ============ PEGAR CSRF ============ */
+        function getCookie(name) {
+            const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return v ? v.pop() : '';
         }
+        const csrftoken = getCookie('csrftoken');
 
-        // Criar meta via AJAX
-        document.getElementById("form-meta")?.addEventListener("submit", function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-
-            fetch("{% url 'criar_meta_ajax' comunidade.id %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": formData.get("csrfmiddlewaretoken")
-                },
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "ok") {
-                        location.reload();
-                    } else {
-                        alert("Erro ao criar meta: " + data.msg);
-                    }
-                });
-        });
-
-        // Aplicar tema da comunidade
-        // Aplicar tema da comunidade — versão segura que respeita o style inline
-        // função para clarear cor
-        function lightenColor(hex, percent) {
-            hex = hex.replace("#", "");
-            const num = parseInt(hex, 16);
-            let r = (num >> 16) + Math.round(255 * percent);
-            let g = ((num >> 8) & 0x00FF) + Math.round(255 * percent);
-            let b = (num & 0x0000FF) + Math.round(255 * percent);
-            r = r > 255 ? 255 : r;
-            g = g > 255 ? 255 : g;
-            b = b > 255 ? 255 : b;
-            return `rgb(${r}, ${g}, ${b})`;
-        }
-        document.addEventListener("DOMContentLoaded", () => {
-            const bg = "{{ cor_bg }}";
-            const fg = "{{ cor_fg }}";
-
-            document.documentElement.style.setProperty("--comunidade-bg", bg);
-            document.documentElement.style.setProperty("--comunidade-fg", fg);
-        });
+        /* ============ CHECKBOX ============ */
         document.querySelectorAll(".check-meta").forEach(chk => {
-            chk.addEventListener("change", function () {
-                fetch(`/meta/${this.dataset.id}/cumprir/`, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": "{{ csrf_token }}",
+            chk.addEventListener("change", async function () {
+
+                const metaId = this.dataset.id;
+                const card = this.closest(".meta-card");
+
+                this.disabled = true;
+                card.classList.add("updating");
+
+                try {
+                    const res = await fetch(`/meta/${metaId}/cumprir/`, {
+                        method: "POST",
+                        headers: { "X-CSRFToken": csrftoken },
+                        credentials: "same-origin"
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        if (data.checked) {
+                            card.classList.add("cumprida");
+                        } else {
+                            card.classList.remove("cumprida");
+                        }
+                    } else {
+                        this.checked = !this.checked;
+                        alert("Erro ao atualizar");
                     }
-                }).then(() => {
-                    // deixar a meta mais transparente para mostrar que foi cumprida
-                    this.closest(".meta-card").style.opacity = 0.55;
-                });
+
+                } catch (err) {
+                    console.error(err);
+                    this.checked = !this.checked;
+                    alert("Erro ao atualizar meta. Tente novamente.");
+                }
+
+                card.classList.remove("updating");
+                this.disabled = false;
             });
         });
     </script>
