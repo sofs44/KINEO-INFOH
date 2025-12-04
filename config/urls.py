@@ -50,6 +50,8 @@ urlpatterns = [
     path("chat/", views.chat_view, name="chat"),
     path("chat/u/<int:usuario_id>/", views.conversa, name="conversa"),  # Conversa individual
     path("chat/g/<int:grupo_id>/", views.conversa_grupo, name="conversa_grupo"),  # Conversa em grupo
+
+    path('perfil/<int:usuario_id>/', views.perfil_publico, name='perfil_publico'),
 ]
 
 if settings.DEBUG:

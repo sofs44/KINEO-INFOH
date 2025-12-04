@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil de {{ perfil_user.nome }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f6f8; color: #333; }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .cover-photo {
+            height: 150px;
+            background: linear-gradient(135deg, #d87300, #ff9f43);
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            background: rgba(0,0,0,0.2);
+            width: 40px; 
+            height: 40px;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .back-btn:hover { background: rgba(0,0,0,0.4); }
+
+        .profile-header {
+            text-align: center;
+            padding: 0 20px 30px;
+            margin-top: -75px; /* Puxa a foto para cima da capa */
+        }
+
+        .avatar-wrapper {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .default-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #eee;
+            color: #888;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 3rem;
+            border: 5px solid #fff;
+        }
+
+        h1 { font-size: 2rem; color: #222; margin-bottom: 5px; }
+        .user-meta { color: #666; font-size: 0.95rem; display: flex; justify-content: center; gap: 15px; }
+        .user-meta i { color: #d87300; margin-right: 5px; }
+
+        .profile-body {
+            padding: 20px 40px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .info-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        h3 { font-size: 1.1rem; margin-bottom: 15px; color: #444; display: flex; align-items: center; gap: 10px; }
+        
+        .info-item { margin-bottom: 10px; font-size: 0.95rem; }
+        .info-item strong { color: #333; display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;}
+
+        .action-area {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-chat {
+            display: inline-block;
+            background: #d87300;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(216, 115, 0, 0.3);
+            transition: 0.3s;
+        }
+        .btn-chat:hover { background: #bf6600; transform: translateY(-2px); }
+
+        @media (max-width: 600px) {
+            .profile-body { grid-template-columns: 1fr; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="profile-container">
+    <div class="cover-photo">
+        <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    </div>
+
+    <div class="profile-header">
+        <div class="avatar-wrapper">
+            {% if perfil_user.foto_perfil %}
+                <img src="{{ perfil_user.foto_perfil.url }}" alt="{{ perfil_user.nome }}" class="avatar">
+            {% else %}
+                <div class="default-avatar">{{ perfil_user.nome|slice:":1"|upper }}</div>
+            {% endif %}
+        </div>
+        
+        <h1>{{ perfil_user.nome }}</h1>
+        <div class="user-meta">
+            {% if perfil_user.idade %}
+                <span><i class="fas fa-birthday-cake"></i> {{ perfil_user.idade|timesince }} (aprox)</span>
+            {% endif %}
+            <span><i class="fas fa-id-card"></i> Membro Kineo</span>
+        </div>
+    </div>
+
+    <div class="profile-body">
+        <div class="info-card">
+            <h3><i class="fas fa-running" style="color:#d87300"></i> Esportes</h3>
+            {% if preferencia %}
+                <div class="info-item">
+                    <strong>Principal</strong>
+                    {{ preferencia.esportes|default:"Não informado" }}
+                </div>
+                <div class="info-item">
+                    <strong>Nível</strong>
+                    {{ preferencia.get_nivel_display|default:"Iniciante" }}
+                </div>
+                <div class="info-item">
+                    <strong>Turno Preferido</strong>
+                    {{ preferencia.get_turno_display|default:"Qualquer horário" }}
+                </div>
+            {% else %}
+                <p style="color:#999">Este usuário ainda não configurou preferências.</p>
+            {% endif %}
+        </div>
+
+        <div class="info-card">
+            <h3><i class="fas fa-map-marker-alt" style="color:#d87300"></i> Detalhes</h3>
+            <div class="info-item">
+                <strong>Localização</strong>
+                {{ perfil_user.parceiros.first.localizacao|default:"Localização não informada" }}
+            </div>
+            <div class="info-item">
+                <strong>Perfil</strong>
+                {{ preferencia.get_sexo_display|default:"Não informado" }}
+            </div>
+        </div>
+
+        <div class="action-area">
+            <a href="{% url 'conversa' perfil_user.id_usuario %}" class="btn-chat">
+                <i class="fas fa-comment-dots"></i> Enviar Mensagem
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

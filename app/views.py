@@ -948,3 +948,20 @@ def calcular_ranking_global():
         ranking, _ = Ranking.objects.get_or_create(usuario=usuario)
         ranking.pontuacao_total = usuario.total_metas * PONTOS_POR_META
         ranking.save()
+
+
+def perfil_publico(request, usuario_id):
+    # Busca o usuário pelo ID ou dá erro 404 se não existir
+    perfil_user = get_object_or_404(Usuario, id_usuario=usuario_id)
+    
+    # Busca a preferência desse usuário (se tiver)
+    preferencia = perfil_user.preferencias.first()
+    
+    # Verifica se já são parceiros ou se há chat (opcional, para botões de ação)
+    # Por enquanto vamos focar em exibir os dados
+    
+    context = {
+        'perfil_user': perfil_user,
+        'preferencia': preferencia,
+    }
+    return render(request, 'perfil_publico.html', context)

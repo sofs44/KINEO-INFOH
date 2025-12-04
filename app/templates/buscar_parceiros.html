@@ -281,7 +281,7 @@
             <h2 class="section-title">Resultados da Busca</h2>
             
             {% for p in parceiros %}
-            <a href="#" class="card-link">
+            <a href="{% url 'perfil_publico' p.id_usuario %}" class="card-link">
                 <div class="parceiro-card">
                     <div class="profile-avatar">
                         {% if p.foto_perfil %}
