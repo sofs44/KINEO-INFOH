@@ -737,29 +737,37 @@ from django.utils import timezone
 from app.models import Comunidade, MetaComunidade, Ranking
 
 def metas_view(request, comunidade_id):
+    # Garante que os pontos estão atualizados
+    try:
+        calcular_ranking_global()
+    except:
+        pass
+
     comunidade = get_object_or_404(Comunidade, id=comunidade_id)
     metas = MetaComunidade.objects.filter(comunidade=comunidade)
-
+    
+    # Busca ranking ordenado por pontos
     ranking_list = Ranking.objects.select_related("usuario").order_by("-pontuacao_total")
 
-    colocacao = None
+    colocacao = "-"
     if request.user.is_authenticated:
-        for pos, reg in enumerate(ranking_list, start=1):
+        # LÓGICA CORRIGIDA:
+        # Usa 'enumerate' simples. Se você é o segundo da lista, sua colocação é 2.
+        # Isso alinha com o visual de medalhas da página de ranking.
+        for i, reg in enumerate(ranking_list, start=1):
             if reg.usuario == request.user:
-                colocacao = pos
+                colocacao = i
                 break
 
-
-    # Marca se o usuário já cumpriu cada meta
+    # Verifica cumprimento das metas
     for meta in metas:
         meta.foi_cumprida_pelo_usuario = (
             request.user.is_authenticated
             and meta.usuarios_cumpriram.filter(pk=request.user.pk).exists()
         )
-        # COR DA COMUNIDADE PARA ESTILIZAR A PÁGINA
+
     cor_bg = comunidade.cor
     cor_fg = "#ffffff" if cor_escura(comunidade.cor) else "#000000"
-
 
     context = {
         "comunidade": comunidade,
@@ -767,14 +775,14 @@ def metas_view(request, comunidade_id):
         "colocacao": colocacao,
         "ranking_list": ranking_list,
         "sem_metas": not metas.exists(),
-        "is_admin": ...,
+        "is_admin": request.user == comunidade.admin,
         "cor_bg": cor_bg,
         "cor_fg": cor_fg,
-}
-
-
+    }
 
     return render(request, "metas.html", context)
+
+  
 
 
 
