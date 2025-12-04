@@ -815,6 +815,7 @@ def cumprir_meta(request, meta_id):
 
     meta = get_object_or_404(MetaComunidade, id=meta_id)
 
+    # marcar ou desmarcar meta
     if request.user in meta.usuarios_cumpriram.all():
         meta.usuarios_cumpriram.remove(request.user)
         estado = False
@@ -822,10 +823,14 @@ def cumprir_meta(request, meta_id):
         meta.usuarios_cumpriram.add(request.user)
         estado = True
 
+    # recalcula ranking global
     calcular_ranking_global()
 
+    return JsonResponse({
+        "success": True,
+        "checked": estado
+    })
 
-    return JsonResponse({"success": True, "checked": estado})
 
 
 

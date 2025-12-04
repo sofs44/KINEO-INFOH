@@ -307,336 +307,133 @@
 }
 
 /* ===== Modal overlay ===== */
-.modal-overlay {
+/* --------------- MODAL LIMPO E ÚNICO --------------- */
+#modal-adicionar-meta {
   position: fixed;
-  inset: 0;                 /* top:0; right:0; bottom:0; left:0 */
-  display: none;            /* JS controla */
-  align-items: center;      /* centra verticalmente (quando display:flex) */
-  justify-content: center;  /* centra horizontalmente */
-  background: rgba(0,0,0,0.35);
-  z-index: 1200;
-  padding: 24px;
+  inset: 0;
+  display: none;               /* começa escondido */
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* modal wrapper para controlar largura */
+/* wrapper para controlar a largura e animação */
 .modal-wrapper {
-  max-width: 520px;
-  width: 100%;
+  width: 420px;
+  max-width: 95%;
+  box-sizing: border-box;
 }
 
-/* conteúdo do modal */
+/* a "caixa" do modal */
 .modal-content {
-  background: var(--comunidade-bg);
-  color: var(--comunidade-fg);
+  background: var(--comunidade-bg, #ffffff); /* usa a cor da comunidade se existir */
+  color: var(--comunidade-fg, #222222);
   border-radius: 14px;
   padding: 26px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
-  transform: translateY(-6px);
-  transition: transform .18s ease, opacity .18s ease;
-  opacity: 1;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+  text-align: center;
+  animation: modalZoom .20s ease-out;
 }
 
 /* título */
 .modal-content h3 {
-  margin: 0 0 14px 0;
+  margin: 0 0 14px;
   font-size: 20px;
-  text-align: center;
+  font-weight: 700;
 }
 
-/* form control */
-.form-control {
+/* input */
+#titulo-meta {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.08);
-  margin-bottom: 12px;
+  background: rgba(255,255,255,0.06);
+  margin-top: 10px;
   box-sizing: border-box;
+  color: inherit;
 }
 
-/* ações do modal (botões) */
+/* buttons */
 .modal-actions {
   display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 6px;
+  gap: 10px;
+  margin-top: 18px;
 }
 
-/* botões (reuse seus estilos, se necessário ajuste classes) */
 .btn {
-  padding: 10px 18px;
+  flex: 1;
+  padding: 10px;
   border-radius: 10px;
-  cursor: pointer;
   font-weight: 600;
-  min-width: 110px;
   border: none;
-}
-
-/* exemplo: btn-primary e btn--danger já existem, se não ajustar cores */
-.btn-primary { background: rgba(255,255,255,0.16); color: var(--comunidade-fg); }
-.btn--danger { background: rgba(255,255,255,0.12); color: var(--comunidade-fg); }
-
-/* prevenir scroll do body quando modal aberto */
-body.modal-open {
-  overflow: hidden;
-}
-
-/* ===== MODAL ===== */
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.modal-wrapper {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 380px;
-    max-width: 90%;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    font-size: 22px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #aaa;
-    border-radius: 8px;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.modal-actions .btn {
-    flex: 1;
-}
-
-.modal-open {
-    overflow: hidden;
-}
-/* ====== MODAL VISUAL LINDO ====== */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.25s ease-out;
-    z-index: 9999;
-}
-
-/* ESTE É O QUADRINHO DO MODAL */
-.modal-wrapper {
-    background: #ffffff;
-    padding: 30px 35px;
-    border-radius: 18px;
-    width: 420px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
-    animation: zoomIn 0.25s ease-out;
-}
-
-.modal-content {
-    text-align: center;
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    font-size: 22px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 15px;
-    border: 1px solid #d1d1d1;
-    border-radius: 10px;
-    background: #f7f7f7;
-    transition: all 0.2s ease-in-out;
-}
-
-.modal-content input:focus {
-    background: #fff;
-    border-color: #ff7373;
-    box-shadow: 0 0 0 3px rgba(255, 115, 115, 0.25);
-    outline: none;
-}
-
-.modal-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: 0.2s;
+  cursor: pointer;
 }
 
 .btn-primary {
-    background: #ff7d7d;
-    border: none;
-    color: white;
+  background: #ff7d7d;
+  color: #fff;
 }
-
-.btn-primary:hover {
-    background: #ff4f4f;
-}
+.btn-primary:hover { background: #ff4f4f; }
 
 .btn-secondary {
-    background: #e6e6e6;
-    border: none;
-    color: #333;
+  background: rgba(255,255,255,0.16);
+  color: inherit;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.28); }
+
+/* prevenir scroll do body quando modal aberto */
+body.modal-open { overflow: hidden !important; }
+
+/* animação */
+@keyframes modalZoom {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
 }
 
-.btn-secondary:hover {
-    background: #d4d4d4;
+/* Forçar o modal escondido caso outra regra tente mostrar */
+#modal-adicionar-meta[aria-hidden="true"] { display: none !important; }
+#modal-adicionar-meta[aria-hidden="false"] { display: flex !important; }
+
+/* FORÇA o botão do ranking a ficar igual aos outros */
+.ranking-box a.btn-ranking,
+.ranking-box button.btn-ranking {
+    width: 100% !important;
+    padding: 10px 0 !important;
+    margin: 6px 0 !important;
+    border: none !important;
+    outline: none !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,0.2) !important;
+    color: var(--comunidade-fg) !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    cursor: pointer !important;
+    transition: 0.2s !important;
 }
 
-/* Animações */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+.ranking-box a.btn-ranking:hover,
+.ranking-box button.btn-ranking:hover {
+    background: rgba(255,255,255,0.35) !important;
 }
 
-@keyframes zoomIn {
-    from {
-        opacity: 0;
-        transform: scale(0.85);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
 
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
-}
-
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    min-width: 300px;
-    max-width: 400px;
-}
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 350px;
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-}
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.modal-content {
-    background: white;
-    width: 340px;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0 20px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.modal-content {
-    background: #fff;
-    padding: 25px;
-    width: 320px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin: 15px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-.modal-actions {
+/* Bolinha cinza das colocações acima do 3º */
+.circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #d4d4d4;     /* Cinza claro */
+    color: #333;             /* Texto escuro para contraste */
     display: flex;
-    justify-content: space-between;
-}
-
-/* FORÇA o modal a começar sempre escondido */
-#modal-adicionar-meta {
-    display: none !important;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 18px;
+    border: 2px solid #bdbdbd; /* Um contorno leve (opcional) */
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.15); /* igual aos ícones grandes */
 }
-
